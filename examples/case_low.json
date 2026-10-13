@@ -1,0 +1,55 @@
+{
+  "case_id": "DEMO-LOW-01",
+  "data_origin": "illustrative_synthetic",
+  "scenario_note": "Illustrative scenario: relatively calm queue",
+  "domains": {
+    "crowd": {
+      "density_people_per_m2": {
+        "value": 0.8,
+        "quality": "observed",
+        "age_minutes": 2,
+        "source": "handcrafted simulation"
+      },
+      "queue_minutes": {
+        "value": 7,
+        "quality": "observed",
+        "age_minutes": 2,
+        "source": "handcrafted simulation"
+      },
+      "distance_km": {
+        "value": 0.4,
+        "quality": "observed",
+        "age_minutes": 2,
+        "source": "handcrafted simulation"
+      }
+    },
+    "health": {
+      "fatigue_1_to_5": {
+        "value": 1,
+        "quality": "observed",
+        "age_minutes": 2,
+        "source": "handcrafted simulation"
+      },
+      "stress_1_to_5": {
+        "value": 1,
+        "quality": "observed",
+        "age_minutes": 2,
+        "source": "handcrafted simulation"
+      },
+      "emergency_event": {
+        "value": false,
+        "quality": "observed",
+        "age_minutes": 2,
+        "source": "handcrafted simulation"
+      }
+    },
+    "environment": {
+      "temperature_c": {
+        "value": 29,
+        "quality": "observed",
+        "age_minutes": 2,
+        "source": "handcrafted simulation"
+      }
+    }
+  }
+}

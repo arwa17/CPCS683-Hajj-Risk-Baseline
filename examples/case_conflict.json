@@ -1,0 +1,61 @@
+{
+  "case_id": "DEMO-CONFLICT-05",
+  "data_origin": "illustrative_synthetic",
+  "scenario_note": "Illustrative scenario: crowd sources disagree",
+  "domains": {
+    "crowd": {
+      "density_people_per_m2": {
+        "value": 4.4,
+        "quality": "conflicting",
+        "age_minutes": 4,
+        "source": "counter A (synthetic)",
+        "alternate_values": [
+          {
+            "value": 1.2,
+            "source": "counter B (synthetic)"
+          }
+        ]
+      },
+      "queue_minutes": {
+        "value": 28,
+        "quality": "observed",
+        "age_minutes": 2,
+        "source": "handcrafted simulation"
+      },
+      "distance_km": {
+        "value": 1.2,
+        "quality": "observed",
+        "age_minutes": 2,
+        "source": "handcrafted simulation"
+      }
+    },
+    "health": {
+      "fatigue_1_to_5": {
+        "value": 3,
+        "quality": "observed",
+        "age_minutes": 2,
+        "source": "handcrafted simulation"
+      },
+      "stress_1_to_5": {
+        "value": 3,
+        "quality": "observed",
+        "age_minutes": 2,
+        "source": "handcrafted simulation"
+      },
+      "emergency_event": {
+        "value": false,
+        "quality": "observed",
+        "age_minutes": 2,
+        "source": "handcrafted simulation"
+      }
+    },
+    "environment": {
+      "temperature_c": {
+        "value": 38,
+        "quality": "observed",
+        "age_minutes": 2,
+        "source": "handcrafted simulation"
+      }
+    }
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "case_id": "DEMO-HIGH-02",
+  "data_origin": "illustrative_synthetic",
+  "scenario_note": "Illustrative scenario: several elevated-risk indicators",
+  "domains": {
+    "crowd": {
+      "density_people_per_m2": {
+        "value": 4.2,
+        "quality": "observed",
+        "age_minutes": 2,
+        "source": "handcrafted simulation"
+      },
+      "queue_minutes": {
+        "value": 42,
+        "quality": "observed",
+        "age_minutes": 2,
+        "source": "handcrafted simulation"
+      },
+      "distance_km": {
+        "value": 1.3,
+        "quality": "observed",
+        "age_minutes": 2,
+        "source": "handcrafted simulation"
+      }
+    },
+    "health": {
+      "fatigue_1_to_5": {
+        "value": 4,
+        "quality": "observed",
+        "age_minutes": 2,
+        "source": "handcrafted simulation"
+      },
+      "stress_1_to_5": {
+        "value": 5,
+        "quality": "observed",
+        "age_minutes": 2,
+        "source": "handcrafted simulation"
+      },
+      "emergency_event": {
+        "value": true,
+        "quality": "observed",
+        "age_minutes": 2,
+        "source": "handcrafted simulation"
+      }
+    },
+    "environment": {
+      "temperature_c": {
+        "value": 44,
+        "quality": "observed",
+        "age_minutes": 2,
+        "source": "handcrafted simulation"
+      }
+    }
+  }
+}

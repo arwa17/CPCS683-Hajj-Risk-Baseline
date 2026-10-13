@@ -1,0 +1,55 @@
+{
+  "case_id": "DEMO-MED-03",
+  "data_origin": "illustrative_synthetic",
+  "scenario_note": "Illustrative scenario: mixed moderate conditions",
+  "domains": {
+    "crowd": {
+      "density_people_per_m2": {
+        "value": 2.4,
+        "quality": "observed",
+        "age_minutes": 2,
+        "source": "handcrafted simulation"
+      },
+      "queue_minutes": {
+        "value": 19,
+        "quality": "observed",
+        "age_minutes": 2,
+        "source": "handcrafted simulation"
+      },
+      "distance_km": {
+        "value": 0.9,
+        "quality": "observed",
+        "age_minutes": 2,
+        "source": "handcrafted simulation"
+      }
+    },
+    "health": {
+      "fatigue_1_to_5": {
+        "value": 3,
+        "quality": "observed",
+        "age_minutes": 2,
+        "source": "handcrafted simulation"
+      },
+      "stress_1_to_5": {
+        "value": 2,
+        "quality": "observed",
+        "age_minutes": 2,
+        "source": "handcrafted simulation"
+      },
+      "emergency_event": {
+        "value": false,
+        "quality": "observed",
+        "age_minutes": 2,
+        "source": "handcrafted simulation"
+      }
+    },
+    "environment": {
+      "temperature_c": {
+        "value": 37,
+        "quality": "observed",
+        "age_minutes": 2,
+        "source": "handcrafted simulation"
+      }
+    }
+  }
+}
