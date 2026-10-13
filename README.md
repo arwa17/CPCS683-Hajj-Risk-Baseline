@@ -96,6 +96,26 @@ Every observation includes a value, source and quality label. The agent returns 
 | `examples/` | Five synthetic risk scenarios |
 | `tests/test_baseline.py` | Offline tests for input, output, API transport and browser behavior |
 
+## Repeated evaluations
+
+The Gemini generation seed defaults to **42**. The planned evaluation seeds are **11, 42, and 77**. Set `HAJJ_SEED` before launching the app; each run records the configured seed in its trace.
+
+**macOS / Linux:**
+
+```bash
+export HAJJ_SEED=11
+python3 -m hajj_baseline.webapp
+```
+
+**Windows PowerShell:**
+
+```powershell
+$env:HAJJ_SEED="11"
+py -m hajj_baseline.webapp
+```
+
+Stop the server before selecting another seed. Re-run the **same cases** for each seed and record the actual decisions, call counts and time in later milestones. Google's seed setting is a best-effort reproducibility aid, **not a guarantee of identical outputs**, and the current five demo examples are not a scored evaluation set.
+
 ## Tests
 
 Run the tests without a live API request:

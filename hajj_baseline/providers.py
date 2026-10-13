@@ -16,11 +16,21 @@ class LLMProvider:
         self, model: str = "gemini-3.1-flash-lite",
         base_url: str = "https://generativelanguage.googleapis.com/v1beta",
         timeout: int = 120, api_key: str | None = None,
+        seed: int | None = None,
     ):
         self.backend = "gemini"
         self.model = model
         self.base_url = base_url.rstrip("/")
         self.timeout = timeout
+        raw_seed = os.getenv("HAJJ_SEED", "42") if seed is None else seed
+        try:
+            if isinstance(raw_seed, bool):
+                raise ValueError("boolean is not a valid seed")
+            self.seed = int(raw_seed)
+            if not 0 <= self.seed <= 2147483647:
+                raise ValueError("seed is out of range")
+        except (ValueError, TypeError) as exc:
+            raise ProviderError("HAJJ_SEED must be an integer between 0 and 2147483647.") from exc
         self.api_key = api_key if api_key is not None else os.getenv("GEMINI_API_KEY", "")
         if not self.api_key:
             raise ProviderError(
@@ -34,6 +44,7 @@ class LLMProvider:
             "contents": [{"role": "user", "parts": [{"text": user_prompt}]}],
             "generationConfig": {
                 "temperature": 0,
+                "seed": self.seed,
                 "responseMimeType": "application/json",
             },
         }

@@ -84,6 +84,7 @@ class GeneralistAgent:
             "backend": self.provider.backend,
             "model": self.provider.model,
             "temperature": 0,
+            "seed": getattr(self.provider, "seed", None),
             "latency_ms_this_pass": latency_ms,
             "input_tokens": usage.get("input_tokens"),
             "output_tokens": usage.get("output_tokens"),

@@ -2,6 +2,7 @@
 import json
 import threading
 import unittest
+from unittest.mock import patch
 from copy import deepcopy
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -32,6 +33,7 @@ def decision(case):
 class FakeLLM:
     backend="gemini"
     model="test-only"
+    seed=42
     def __init__(self, output):
         self.output=output
         self.calls=0
@@ -133,6 +135,17 @@ class BaselineTests(unittest.TestCase):
         finally:
             server.shutdown();server.server_close()
 
+    def test_seed_configuration(self):
+        for value in (11, 42, 77):
+            with self.subTest(seed=value):
+                self.assertEqual(LLMProvider(api_key="test-token", seed=value).seed, value)
+        with patch.dict("os.environ", {"HAJJ_SEED": "77"}):
+            self.assertEqual(LLMProvider(api_key="test-token").seed, 77)
+        with patch.dict("os.environ", {"HAJJ_SEED": "invalid"}):
+            from hajj_baseline.providers import ProviderError
+            with self.assertRaises(ProviderError):
+                LLMProvider(api_key="test-token")
+
     def test_gemini_transport(self):
         """Verify Gemini REST request shape, API key header, and JSON reply parsing."""
         case = sample()
@@ -164,6 +177,7 @@ class BaselineTests(unittest.TestCase):
         try:
             provider = LLMProvider(
                 api_key="test-token",
+                seed=42,
                 model="gemini-3.1-flash-lite",
                 base_url=f"http://127.0.0.1:{server.server_port}",
             )
@@ -175,6 +189,8 @@ class BaselineTests(unittest.TestCase):
             self.assertEqual(seen[0][1], "test-token")
             self.assertEqual(seen[0][2]["generationConfig"]["responseMimeType"], "application/json")
             self.assertEqual(seen[0][2]["generationConfig"]["temperature"], 0)
+            self.assertEqual(seen[0][2]["generationConfig"]["seed"], 42)
+            self.assertEqual(result.trace["seed"], 42)
             self.assertTrue(seen[0][2]["systemInstruction"]["parts"][0]["text"])
         finally:
             server.shutdown()
