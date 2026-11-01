@@ -177,6 +177,21 @@ class TestScoringIntegrity(unittest.TestCase):
         record={'trace':{'model':'gemini-3.5-flash-lite','prompt_version':'v7_2','temperature':1.0}}
         self.assertEqual(run_identity([record,record])['prompt_version'],'v7_2')
 
+    def test_recovered_trajectory_counts_complete(self):
+        from m5_finalize import trajectory_complete
+        cases=[json.loads(s) for s in Path('v7_synthetic_data/test_locked_cases.jsonl').read_text().splitlines() if s]
+        case=next(c for c in cases if c['case_id']=='V7-0123')
+        result=FactorizedV7(RepairProvider('crowd.distance_between_people_m'),'multi').evaluate(case)
+        self.assertEqual(result.trace['agent_calls_this_pass'],4)
+        self.assertTrue(trajectory_complete(result.trace,'multi_factorized_v7'))
+
+    def test_failed_trajectory_is_not_complete(self):
+        from m5_finalize import trajectory_complete
+        cases=[json.loads(s) for s in Path('v7_synthetic_data/test_locked_cases.jsonl').read_text().splitlines() if s]
+        case=next(c for c in cases if c['case_id']=='V7-0123')
+        result=FactorizedV7(RepairProvider('crowd.distance_between_people_m',fail_forever=True),'multi').evaluate(case)
+        self.assertFalse(trajectory_complete(result.trace,'multi_factorized_v7'))
+
     def test_mixed_code_versions_are_rejected(self):
         from m5_finalize import run_identity
         a={'trace':{'model':'gemini-3.5-flash-lite','prompt_version':'v7_1','temperature':1.0}}

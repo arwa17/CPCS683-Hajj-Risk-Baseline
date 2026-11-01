@@ -54,6 +54,24 @@ def run_identity(rows):
     return {'model':model, 'prompt_version':prompt_version, 'temperature':temperature}
 
 
+def trajectory_complete(trace, condition):
+    if trace.get('schema_valid') is not True:
+        return False
+    expected = {'single'} if condition=='single_factorized_v7' else {'crowd','health','environment'}
+    reports = trace.get('report_bands') or {}
+    if set(reports) != expected:
+        return False
+    attempts = trace.get('report_attempts')
+    calls = trace.get('agent_calls_this_pass')
+    if isinstance(attempts, dict) and attempts:
+        if set(attempts) != expected:
+            return False
+        if any(not isinstance(a,list) or len(a) not in (1,2) for a in attempts.values()):
+            return False
+        return calls == sum(len(a) for a in attempts.values())
+    return calls == len(expected)
+
+
 def extra_metrics(rows):
     groups=defaultdict(list)
     for r in rows: groups[r['condition'],str(r['seed'])].append(r)
@@ -64,7 +82,7 @@ def extra_metrics(rows):
         result.append({'condition':condition,'seed':seed,'cases':len(batch),
             'mean_observed_band_accuracy':round(statistics.mean(x),6) if x else None,
             'band_accuracy_trace_coverage':round(len(x)/len(batch),6),
-            'complete_trajectory_rate':round(sum(t.get('schema_valid') is True and t.get('agent_calls_this_pass')==(1 if condition=='single_factorized_v7' else 3) for t in traces)/len(batch),6)})
+            'complete_trajectory_rate':round(sum(trajectory_complete(t,condition) for t in traces)/len(batch),6)})
     return result
 
 def main():
