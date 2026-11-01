@@ -1,0 +1,3 @@
+condition,seed,cases,mean_observed_band_accuracy,band_accuracy_trace_coverage,complete_trajectory_rate
+multi_factorized_v7,11,36,0.996032,1.0,1.0
+single_factorized_v7,11,36,0.995918,0.972222,0.972222

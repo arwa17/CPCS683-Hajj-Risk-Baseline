@@ -1,0 +1,12 @@
+{"case_id": "V7-0001", "gold_label": "LOW", "reference_policy": "hajj_ai_course_v7_illustrative_policy", "case_group": "all_observed"}
+{"case_id": "V7-0002", "gold_label": "LOW", "reference_policy": "hajj_ai_course_v7_illustrative_policy", "case_group": "all_observed"}
+{"case_id": "V7-0007", "gold_label": "LOW", "reference_policy": "hajj_ai_course_v7_illustrative_policy", "case_group": "all_observed"}
+{"case_id": "V7-0008", "gold_label": "LOW", "reference_policy": "hajj_ai_course_v7_illustrative_policy", "case_group": "one_unreliable_field"}
+{"case_id": "V7-0003", "gold_label": "MEDIUM", "reference_policy": "hajj_ai_course_v7_illustrative_policy", "case_group": "all_observed"}
+{"case_id": "V7-0004", "gold_label": "MEDIUM", "reference_policy": "hajj_ai_course_v7_illustrative_policy", "case_group": "all_observed"}
+{"case_id": "V7-0005", "gold_label": "MEDIUM", "reference_policy": "hajj_ai_course_v7_illustrative_policy", "case_group": "one_unreliable_field"}
+{"case_id": "V7-0006", "gold_label": "MEDIUM", "reference_policy": "hajj_ai_course_v7_illustrative_policy", "case_group": "one_unreliable_field"}
+{"case_id": "V7-0010", "gold_label": "HIGH", "reference_policy": "hajj_ai_course_v7_illustrative_policy", "case_group": "all_observed"}
+{"case_id": "V7-0013", "gold_label": "HIGH", "reference_policy": "hajj_ai_course_v7_illustrative_policy", "case_group": "one_unreliable_field"}
+{"case_id": "V7-0030", "gold_label": "HIGH", "reference_policy": "hajj_ai_course_v7_illustrative_policy", "case_group": "all_observed"}
+{"case_id": "V7-0048", "gold_label": "HIGH", "reference_policy": "hajj_ai_course_v7_illustrative_policy", "case_group": "all_observed"}

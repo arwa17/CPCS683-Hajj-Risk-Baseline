@@ -1,0 +1,3 @@
+condition,seeds,schema_validity_mean,schema_validity_sd,coverage_mean,coverage_sd,selective_accuracy_mean,selective_accuracy_sd,all_case_accuracy_mean,all_case_accuracy_sd,review_valid_rate_mean,review_valid_rate_sd,beneficial_flip_rate_mean,beneficial_flip_rate_sd,harmful_flip_rate_mean,harmful_flip_rate_sd,specialist_validity_mean,specialist_validity_sd,mean_latency_ms_mean,mean_latency_ms_sd,mean_calls_mean,mean_calls_sd,mean_input_tokens_mean,mean_input_tokens_sd,mean_output_tokens_mean,mean_output_tokens_sd,total_cases_across_seeds
+multi_factorized_v7,1,1.0,,0.805556,,1.0,,0.805556,,,,,,,,,,12313.65,,3,,1182.31,,117.17,,36
+single_factorized_v7,1,0.972222,,0.805556,,1.0,,0.805556,,,,,,,,,,5767.09,,1,,777.31,,101.5,,36

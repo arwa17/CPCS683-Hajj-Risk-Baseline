@@ -1,0 +1,10 @@
+{
+  "reference": "single_factorized_v7",
+  "candidate": "multi_factorized_v7",
+  "paired_seed_case_runs": 36,
+  "both_accepted": 29,
+  "both_accepted_both_correct": 29,
+  "both_correct": 29,
+  "both_not_correct": 7,
+  "note": "Paired observations of the same cases across seeds are NOT independent cases."
+}

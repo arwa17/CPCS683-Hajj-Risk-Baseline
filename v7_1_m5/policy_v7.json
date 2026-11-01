@@ -1,0 +1,60 @@
+{
+  "name": "hajj_ai_course_v7_illustrative_policy",
+  "research_only": true,
+  "note": "Team-proposed demonstration policy; not inferred from M5 gold labels; not suitable for real-world Hajj decisions.",
+  "banding": {
+    "crowd.density_level": {
+      "type": "ordinal",
+      "mapping": {
+        "Low": 0,
+        "Medium": 1,
+        "High": 2
+      }
+    },
+    "crowd.queue_minutes": {
+      "type": "ascending",
+      "medium_from": 20,
+      "high_from": 50
+    },
+    "crowd.distance_between_people_m": {
+      "type": "descending",
+      "medium_below": 1.5,
+      "high_below": 0.75
+    },
+    "health.fatigue_level": {
+      "type": "ordinal",
+      "mapping": {
+        "Low": 0,
+        "Medium": 1,
+        "High": 2
+      }
+    },
+    "health.stress_level": {
+      "type": "ordinal",
+      "mapping": {
+        "Low": 0,
+        "Medium": 1,
+        "High": 2
+      }
+    },
+    "health.emergency_event": {
+      "type": "boolean",
+      "false": 0,
+      "true": 2
+    },
+    "environment.temperature_c": {
+      "type": "ascending",
+      "medium_from": 33,
+      "high_from": 39
+    }
+  },
+  "aggregation": {
+    "method": "equal_weight_domain_means",
+    "low_below": 0.7,
+    "high_from": 1.35,
+    "missing_quality_possible_bands": [
+      0,
+      2
+    ]
+  }
+}
