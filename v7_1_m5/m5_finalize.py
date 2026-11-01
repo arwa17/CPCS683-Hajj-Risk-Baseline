@@ -40,6 +40,20 @@ def combine_and_check(paths, allow_incomplete):
         raise ValueError(f'Incomplete three-seed M5 results: {len(missing)} missing rows. First: {missing[:4]}')
     return [found[k] for k in sorted(found)],missing
 
+def run_identity(rows):
+    identities = set()
+    for row in rows:
+        trace = row.get('trace') or {}
+        identity = (trace.get('model'), trace.get('prompt_version'), trace.get('temperature'))
+        if any(value is None for value in identity):
+            raise ValueError('Missing model, prompt version, or temperature in evaluation trace')
+        identities.add(identity)
+    if len(identities) != 1:
+        raise ValueError('Mixed experiment versions or model settings: separate runs before scoring')
+    model, prompt_version, temperature = next(iter(identities))
+    return {'model':model, 'prompt_version':prompt_version, 'temperature':temperature}
+
+
 def extra_metrics(rows):
     groups=defaultdict(list)
     for r in rows: groups[r['condition'],str(r['seed'])].append(r)
@@ -55,13 +69,14 @@ def extra_metrics(rows):
 
 def main():
     p=argparse.ArgumentParser()
-    p.add_argument('--out',default='results/m5_score')
+    p.add_argument('--out',default='results/m5_35_score')
     p.add_argument('--allow-incomplete',action='store_true',help='Preview only. Do not submit as three-seed evidence.')
-    p.add_argument('--results',nargs='+',default=['results/v71_test_seed11.jsonl','results/v71_test_extra_seeds.jsonl'])
+    p.add_argument('--results',nargs='+',default=['results/v71_35_all_seeds.jsonl'])
     a=p.parse_args()
     verify_hashes()
     rows,missing=combine_and_check(a.results,a.allow_incomplete)
     if not rows: raise ValueError('No evaluation results')
+    identity=run_identity(rows)
     per,agg=analyze(rows,load_gold(GOLD))
     comp=extra_metrics(rows)
     paired=paired_comparison(rows,load_gold(GOLD),*CONDITIONS)
@@ -70,13 +85,13 @@ def main():
     save_csv(out/'mean_sd.csv',agg)
     save_csv(out/'component_trajectory_per_seed.csv',comp)
     (out/'paired.json').write_text(json.dumps(paired,indent=2),encoding='utf-8')
-    status={'gold_cases':len(set(r['case_id'] for r in read_jsonl(CASES))),
+    status={**identity, 'gold_cases':len(set(r['case_id'] for r in read_jsonl(CASES))),
         'completed_rows':len(rows),'expected_rows':len(SEEDS)*len(CONDITIONS)*36,
         'missing_rows':len(missing),'seeds_completed':sorted(set(r['seed'] for r in per if r['cases']==36)),
         'complete':not missing,
         'WARNING':'PREVIEW ONLY; NOT FINAL THREE-SEED RESULTS' if missing else 'All three seeds complete'}
     (out/'status.json').write_text(json.dumps(status,indent=2),encoding='utf-8')
-    lines=['# M5 results — V7.1','',f"Status: **{'COMPLETE' if not missing else 'INCOMPLETE / PREVIEW ONLY'}**",f"Golden cases: **36**; evaluated rows: **{len(rows)}/216**; missing: **{len(missing)}**.",'',
+    lines=['# M5 results', '', f"Model: **{identity['model']}**; prompt version: **{identity['prompt_version']}**; temperature: **{identity['temperature']}**.", '',f"Status: **{'COMPLETE' if not missing else 'INCOMPLETE / PREVIEW ONLY'}**",f"Golden cases: **36**; evaluated rows: **{len(rows)}/216**; missing: **{len(missing)}**.",'',
     'Synthetic course-label accuracy is not real-world crowd safety validation. Multi-agent and single-agent must use the same cases and seeds.','',
     '| Condition | Seeds | Coverage (mean ± SD) | Selective accuracy (mean ± SD) | Schema validity (mean ± SD) | Calls/case (mean ± SD) | Latency ms (mean ± SD) |',
     '|---|---:|---:|---:|---:|---:|---:|']

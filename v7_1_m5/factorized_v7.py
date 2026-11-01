@@ -34,19 +34,18 @@ NOT real emergency-response guidance.
 """
 
 
-def band_report_schema(paths: list[str]) -> dict:
-    """Gemini structured-output schema; keys match the assigned domain exactly.
-
-    Null is permitted for unreliable observations. Local check_bands enforces
-    the stricter observed/non-observed distinction after model generation.
-    """
-    band_entry = {'type': 'INTEGER', 'nullable': True, 'minimum': 0, 'maximum': 2}
+def band_report_schema(paths: list[str], case: dict) -> dict:
+    properties = {}
+    for path in paths:
+        domain, field = path.split('.')
+        observed = case['domains'][domain][field]['quality'] == 'observed'
+        properties[path] = {'type': 'INTEGER', 'nullable': not observed, 'minimum': 0, 'maximum': 2}
     return {
         'type': 'OBJECT',
         'properties': {
             'bands': {
                 'type': 'OBJECT',
-                'properties': {path: dict(band_entry) for path in paths},
+                'properties': properties,
                 'required': list(paths),
             },
         },
@@ -155,36 +154,65 @@ class FactorizedV7:
         calls, input_tokens, output_tokens=0,0,0
         reports={}
         raw_outputs={}
+        report_attempts={}
+        correction_events=[]
         err=None
         failure_stage=None
         all_bands={}
         try:
             selections=[None] if self.mode=='single' else list(DOMAINS)
             for domain in selections:
+                name=domain or 'single'
                 view=case['domains'] if domain is None else {domain:case['domains'][domain]}
                 paths=list(FIELD_ORDER if domain is None else
                            (f'{domain}.{k}' for k in DOMAIN_FIELDS[domain]))
                 rules={p:POLICY['banding'][p] for p in paths}
                 system=RULES + ('You are a SINGLE generalist; assess all three domains.\n' if domain is None
                                else f'You are a blind {domain} specialist. You see ONLY your domain.\n')
-                prompt=json.dumps({'case_id':case['case_id'],
-                     'observations':view, 'policy_banding':rules,
-                     'output_format':{'bands':{p:'integer 0, 1, 2 or null' for p in paths}}},
-                     sort_keys=True,ensure_ascii=False)
-                failure_stage=f'{domain or "single"}:generation_or_json'
-                raw,usage=self.provider.generate(system,prompt,
-                                                 response_schema=band_report_schema(paths))
-                calls+=1
-                input_tokens+=usage.get('input_tokens') or 0
-                output_tokens+=usage.get('output_tokens') or 0
-                raw_outputs[domain or 'single']=raw
-                obj=decode_json(raw)
-                if not isinstance(obj,dict) or set(obj)!={'bands'}:
-                    raise ValueError('Missing or extra keys in band report')
-                failure_stage=f'{domain or "single"}:band_validation'
-                clean=check_bands(obj['bands'],case,domain)
-                reports[domain or 'single']=clean
-                all_bands.update(clean)
+                expected_format={p: ('integer 0, 1, or 2 required' if case['domains'][p.split('.')[0]][p.split('.')[1]]['quality']=='observed' else 'JSON null required') for p in paths}
+                base={'case_id':case['case_id'], 'observations':view,
+                      'policy_banding':rules, 'output_format':{'bands':expected_format}}
+                failure_detail=None
+                report_attempts[name]=[]
+                for attempt in range(2):
+                    payload=dict(base)
+                    if attempt:
+                        payload['retry_instruction']='The previous band report did not satisfy the supplied quality and numeric policy. Re-check thresholds and boundary operators. Return a fully corrected band report.'
+                        payload['validation_issue']=failure_detail
+                    prompt=json.dumps(payload,sort_keys=True,ensure_ascii=False)
+                    failure_stage=f'{name}:generation_or_json'
+                    raw,usage=self.provider.generate(system,prompt,
+                                                     response_schema=band_report_schema(paths,case))
+                    calls+=1
+                    input_tokens+=usage.get('input_tokens') or 0
+                    output_tokens+=usage.get('output_tokens') or 0
+                    raw_outputs[name]=raw
+                    report_attempts[name].append(raw)
+                    try:
+                        obj=decode_json(raw)
+                        if not isinstance(obj,dict) or set(obj)!={'bands'}:
+                            raise ValueError('Missing or extra keys in band report')
+                        failure_stage=f'{name}:band_validation'
+                        clean=check_bands(obj['bands'],case,domain)
+                        failure_stage=f'{name}:policy_validation'
+                        for path,band in clean.items():
+                            if band is None:
+                                continue
+                            part,field=path.split('.')
+                            target=policy_band(path,case['domains'][part][field]['value'])
+                            if band!=target:
+                                raise ValueError(f'Observed band violates supplied policy: {path}')
+                        reports[name]=clean
+                        all_bands.update(clean)
+                        if attempt:
+                            correction_events.append({'agent':name,'recovered':True,'previous_error':failure_detail})
+                        break
+                    except (ValueError,TypeError,KeyError) as exc:
+                        failure_detail=str(exc)
+                        if attempt:
+                            correction_events.append({'agent':name,'recovered':False,'previous_error':failure_detail})
+                            raise
+                        correction_events.append({'agent':name,'retry_requested':True,'previous_error':failure_detail})
             failure_stage='aggregation'
             decision,diagnostic=aggregate(all_bands,case)
             failure_stage=None
@@ -197,14 +225,15 @@ class FactorizedV7:
         total_observed=sum(band is not None for band in all_bands.values())
         trace={'timestamp_utc':datetime.now(timezone.utc).isoformat(),
             'agent_organization':'single_factorized_policy' if self.mode=='single' else 'multi_blind_factorized_policy',
-            'prompt_version':'hajj_ai_v7_bfsda_course_only',
+            'prompt_version':'hajj_ai_v7_2_policy_validation_retry',
             'model':self.provider.model, 'backend':self.provider.backend,
             'temperature':getattr(self.provider,'temperature',None),'seed':getattr(self.provider,'seed',None),
             'agent_calls_this_pass':calls,'input_tokens':input_tokens,'output_tokens':output_tokens,
             'latency_ms_this_pass':round((time.perf_counter()-start)*1000,2),
             'schema_valid':err is None,'schema_error':err,
             'failure_stage':failure_stage if err else None,
-            'report_bands':reports,'raw_reports':raw_outputs,'aggregator':diagnostic,
+            'report_bands':reports,'raw_reports':raw_outputs,'report_attempts':report_attempts,
+            'correction_events':correction_events,'aggregator':diagnostic,
             'observed_band_accuracy':round(correct_bands/total_observed,6) if total_observed else None,
             'human_decision_required':True, 'policy_name':POLICY['name'],
             'is_synthetic_policy':True}
