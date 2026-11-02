@@ -37,6 +37,24 @@ class TestNetworkRetries(unittest.TestCase):
         self.assertEqual(output, result)
         self.assertEqual((calls, waits), (2, 1))
 
+    def test_dns_name_resolution_retries_and_recovers(self):
+        result = ('{}', {})
+        output, calls, waits = self.run_with_responses([
+            ProviderError('Cannot reach Gemini: <urlopen error [Errno 8] nodename nor servname provided, or not known>'), result
+        ])
+        self.assertEqual(output, result)
+        self.assertEqual((calls, waits), (2, 1))
+
+    def test_dns_error_retries_are_bounded(self):
+        failure = ProviderError('Cannot reach Gemini: <urlopen error [Errno 8] nodename nor servname provided, or not known>')
+        with patch.object(retry, '_original_generate', side_effect=failure) as generate, \
+             patch.object(retry.time, 'sleep') as sleep, \
+             patch.object(retry.random, 'uniform', return_value=0):
+            with self.assertRaises(ProviderError):
+                retry.generate_with_retries(object(), 'system', 'user')
+            self.assertEqual(generate.call_count, 5)
+            self.assertEqual(sleep.call_count, 4)
+
     def test_unauthorized_does_not_retry(self):
         with patch.object(retry, '_original_generate', side_effect=ProviderError('Gemini returned HTTP 401: unauthorized')) as generate, \
              patch.object(retry.time, 'sleep') as sleep:

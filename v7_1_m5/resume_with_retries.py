@@ -18,6 +18,11 @@ TRANSIENT_NETWORK_MESSAGES = (
     'remote disconnected',
     'broken pipe',
     'temporarily unavailable',
+    'nodename nor servname provided',
+    'name or service not known',
+    'temporary failure in name resolution',
+    'getaddrinfo failed',
+    '[errno 8]',
 )
 _original_generate = LLMProvider.generate
 
