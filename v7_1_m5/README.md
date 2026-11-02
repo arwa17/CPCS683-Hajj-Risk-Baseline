@@ -66,6 +66,8 @@ python3 resume_with_retries.py \
 
 A repeat of these eight diagnosed-case outputs is not an independent evaluation. No need to rerun it if the diagnostic test already succeeded on your machine.
 
+Transient Gemini HTTP errors and temporary connection failures (including remote disconnects and read timeouts) are retried with bounded backoff in `resume_with_retries.py`. If all attempts fail, saved JSONL rows remain intact and the same `--resume` command continues from the next unfinished case. This retry-wrapper update does not change the model, prompts, policy or experiment fingerprint.
+
 ### Measure updated V7.2 across all three seeds
 
 To report the **repaired V7.2** as a final new M5/M6 condition, it needs its own complete full-set measurements. Never overwrite or combine the historical results. Actual Gemini calls, usage quota and time costs apply.
