@@ -27,6 +27,32 @@ python3 -m unittest -q test_v7.py
 python3 run_experiment.py --cases v7_synthetic_data/test_locked_cases.jsonl --seeds 11 42 77 --temperature 1.0 --model gemini-3.5-flash-lite --conditions single_factorized_v7 multi_factorized_v7 --dry-run
 ```
 
+## Completed V7.2 locked-test evaluation
+
+The repaired V7.2 experiment has been completed on the same 36 frozen synthetic test cases, both agent conditions, and Seeds 11, 42, and 77. Results are available at `results/v72_35_all_seeds.jsonl`. The strict finalizer reports **216/216 complete**, with no missing rows, model `gemini-3.5-flash-lite`, requested temperature `1.0`, and prompt version `hajj_ai_v7_2_policy_validation_retry`.
+
+| V7.2 mean ± sample SD across 3 seeds | Single-Agent | Multi-Agent |
+|---|---:|---:|
+| Coverage | 80.56% ± 0.00 pp | 79.63% ± 1.60 pp |
+| Selective accuracy among accepted decisions | 100% ± 0.00 pp | 100% ± 0.00 pp |
+| Schema/policy validity | 97.22% ± 0.00 pp | 97.22% ± 2.78 pp |
+| Gemini calls per case | 1.0467 ± 0.0162 | 2.9997 ± 0.0735 |
+| Inference latency per case | 3.27 ± 2.65 s | 9.56 ± 7.90 s |
+
+Across 216 runs: **173 accepted, correct synthetic-policy classifications; 37 abstentions caused by the policy's uncertainty interval; and 6 abstentions from exhausted model-output validation retries**. There were **5 successfully repaired reports** after a second model call. All six final validation failures involved the model's band for `crowd.distance_between_people_m`.
+
+A total of **five** validation failures occurred on case `V7-0021`, where the observed interpersonal distance was 0.46 m but the model repeatedly returned a band other than the required 2. Because crowd density was noisy, a policy-valid report for this case would still abstain. The remaining validation failure was Multi-Agent on case `V7-0005` at Seed 42. Its observed 0.73 m distance also requires band 2; unlike `V7-0021`, all fields were observed and the model failure caused an **avoidable fallback abstention** rather than the valid MEDIUM policy decision.
+
+The Multi-Agent condition did not outperform Single-Agent in this experiment. The 100% selective accuracy applies to accepted outputs only, and the synthetic gold labels are policy-derived rather than independent expert ground truth. `results/m5_v72_score/` contains all per-seed scores, sample SDs, component/trajectory measurements, paired comparison and final report. See `results/m5_v72_score/FAILURE_AUDIT.md` for the audit of all 216 saved traces.
+
+Reproduce the **completed V7.2 scoring** without API calls:
+
+```bash
+python3 m5_finalize.py --results results/v72_35_all_seeds.jsonl --out results/m5_v72_score
+```
+
+This evaluation is post-hoc relative to the previously inspected V7.1 failure cases. Do not present a comparison of the two versions on this same test set as an unbiased performance improvement.
+
 ## Existing complete M5 / M6 evaluation: V7.1 (historical baseline)
 
 The actual 216/216 **prior V7.1** Gemini runs (36 frozen synthetic cases, two arms, Seeds 11/42/77) are preserved under `results/v71_35_all_seeds.jsonl`, scored in `results/m5_35_score/`. The final model was `gemini-3.5-flash-lite`, requested temperature `1.0`. The separate earlier Gemini 3.1 Flash-Lite Seed 11 experiment is in `results/v71_test_seed11.jsonl` and is **not** pooled with the 3.5 results.
@@ -68,9 +94,9 @@ A repeat of these eight diagnosed-case outputs is not an independent evaluation.
 
 Transient Gemini HTTP errors and temporary connection failures (including remote disconnects and read timeouts) are retried with bounded backoff in `resume_with_retries.py`. If all attempts fail, saved JSONL rows remain intact and the same `--resume` command continues from the next unfinished case. This retry-wrapper update does not change the model, prompts, policy or experiment fingerprint.
 
-### Measure updated V7.2 across all three seeds
+### Reproduce the completed V7.2 experiment if required
 
-To report the **repaired V7.2** as a final new M5/M6 condition, it needs its own complete full-set measurements. Never overwrite or combine the historical results. Actual Gemini calls, usage quota and time costs apply.
+The V7.2 live experiment **has already completed**. Its original 216 model outputs and final scoring are saved in this repository. Re-running Gemini is unnecessary for scoring and may produce different outputs or incur additional usage. If a separate reproduction is required, use a fresh output file and do not overwrite or combine historical and current versions.
 
 ```bash
 python3 resume_with_retries.py \
