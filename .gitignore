@@ -8,5 +8,5 @@ __pycache__/
 !.env.example
 .DS_Store
 *.log
-v7_1_m5/results/*.meta.json
-v7_1_m5/results/smoke35.jsonl
+m5/results/*.meta.json
+m5/results/smoke35.jsonl

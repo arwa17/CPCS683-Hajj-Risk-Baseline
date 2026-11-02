@@ -7,9 +7,9 @@ from pathlib import Path
 from collections import defaultdict
 from scoring import analyze, paired_comparison, read_jsonl, load_gold, save_csv
 
-CASES=Path('v7_synthetic_data/test_locked_cases.jsonl')
-GOLD=Path('v7_synthetic_data/test_locked_gold.jsonl')
-MANIFEST=Path('v7_synthetic_data/manifest.json')
+CASES=Path('m5_data/test_locked_cases.jsonl')
+GOLD=Path('m5_data/test_locked_gold.jsonl')
+MANIFEST=Path('m5_data/manifest.json')
 CONDITIONS=('single_factorized_v7','multi_factorized_v7')
 SEEDS=('11','42','77')
 
@@ -87,9 +87,9 @@ def extra_metrics(rows):
 
 def main():
     p=argparse.ArgumentParser()
-    p.add_argument('--out',default='results/m5_v72_score')
+    p.add_argument('--out',default='results/m5_scores')
     p.add_argument('--allow-incomplete',action='store_true',help='Preview only. Do not submit as three-seed evidence.')
-    p.add_argument('--results',nargs='+',default=['results/v72_35_all_seeds.jsonl'])
+    p.add_argument('--results',nargs='+',default=['results/m5_runs.jsonl'])
     a=p.parse_args()
     verify_hashes()
     rows,missing=combine_and_check(a.results,a.allow_incomplete)

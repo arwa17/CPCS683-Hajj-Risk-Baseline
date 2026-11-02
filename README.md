@@ -8,7 +8,7 @@
 
 The goal is to measure a **single-agent baseline** that assigns LOW, MEDIUM or HIGH priority to synthetic Hajj crowd-risk cases or abstains when evidence or model output is unreliable. The study is an illustrative classroom simulation, **not** validated real-world Hajj safety guidance.
 
-The frozen golden set contains **36 synthetic cases** with **36 policy-derived reference labels**. Each case describes seven observations: crowd density, queue time, distance between people, fatigue, stress, emergency event and temperature. Every observation includes its quality and simulated source. The team-defined thresholds are in `v7_1_m5/policy_v7.json`; reference labels are *not* independent expert judgments.
+The frozen golden set contains **36 synthetic cases** with **36 policy-derived reference labels**. Each case describes seven observations: crowd density, queue time, distance between people, fatigue, stress, emergency event and temperature. Every observation includes its quality and simulated source. The team-defined thresholds are in `m5/m5_policy.json`; reference labels are *not* independent expert judgments.
 
 The baseline was evaluated on the **same 36 cases across three seeds** (11, 42 and 77), for **108 completed Single-Agent runs**. The full saved experiment file also contains 108 Multi-Agent runs. The strict scoring program checks the entire **216-row** experimental grid, but only the **Single-Agent rows** are required for this M5 baseline result.
 
@@ -16,15 +16,15 @@ The baseline was evaluated on the **same 36 cases across three seeds** (11, 42 a
 
 | Required item | Location |
 |---|---|
-| Golden set (36 cases) | `v7_1_m5/v7_synthetic_data/test_locked_cases.jsonl` |
-| Reference labels | `v7_1_m5/v7_synthetic_data/test_locked_gold.jsonl` |
-| Frozen-set integrity | `v7_1_m5/v7_synthetic_data/manifest.json` |
-| Automated scoring code | `v7_1_m5/m5_finalize.py` and `scoring.py` |
-| Actual model outputs | `v7_1_m5/results/v72_35_all_seeds.jsonl` |
-| Baseline score for each seed | `v7_1_m5/results/m5_v72_score/per_seed.csv` |
-| Mean and sample standard deviation | `v7_1_m5/results/m5_v72_score/mean_sd.csv` |
-| Component and trajectory metrics | `v7_1_m5/results/m5_v72_score/component_trajectory_per_seed.csv` |
-| Evaluation status and report | `v7_1_m5/results/m5_v72_score/status.json` and `REPORT.md` |
+| Golden set (36 cases) | `m5/m5_data/test_locked_cases.jsonl` |
+| Reference labels | `m5/m5_data/test_locked_gold.jsonl` |
+| Frozen-set integrity | `m5/m5_data/manifest.json` |
+| Automated scoring code | `m5/m5_finalize.py` and `scoring.py` |
+| Actual model outputs | `m5/results/m5_runs.jsonl` |
+| Baseline score for each seed | `m5/results/m5_scores/per_seed.csv` |
+| Mean and sample standard deviation | `m5/results/m5_scores/mean_sd.csv` |
+| Component and trajectory metrics | `m5/results/m5_scores/component_trajectory_per_seed.csv` |
+| Evaluation status and report | `m5/results/m5_scores/status.json` and `REPORT.md` |
 
 ## Baseline results (three seeds)
 
@@ -50,9 +50,9 @@ The baseline was evaluated on the **same 36 cases across three seeds** (11, 42 a
 Python **3.10+** is required; the scoring scripts use the standard library. From the cloned repository:
 
 ```bash
-cd v7_1_m5
+cd m5
 python3 m5_finalize.py
-cat results/m5_v72_score/REPORT.md
+cat results/m5_scores/REPORT.md
 ```
 
 The scorer verifies the golden-set SHA-256 hashes, 36-case coverage per seed/condition, no duplicate rows, and consistent model/parameter identifiers. Expected results: `complete: true`, `missing_rows: 0`, `completed_rows: 216`. The baseline has **108** of these saved rows; the other 108 preserve the controlled follow-on comparison.
@@ -62,25 +62,25 @@ The scorer verifies the golden-set SHA-256 hashes, 36-case coverage per seed/con
 ```text
 README.md
 .gitignore
-v7_1_m5/
-  factorized_v7.py
-  policy_v7.json
+m5/
+  m5_agent.py
+  m5_policy.json
   hajj_baseline/
     __init__.py
     providers.py
     schema.py
-  hajj_agent_inputs_v2.jsonl
+  m5_inputs.jsonl
   run_experiment.py
   resume_with_retries.py
   m5_finalize.py
   scoring.py
-  v7_synthetic_data/
+  m5_data/
     manifest.json
     test_locked_cases.jsonl
     test_locked_gold.jsonl
   results/
-    v72_35_all_seeds.jsonl
-    m5_v72_score/
+    m5_runs.jsonl
+    m5_scores/
       REPORT.md
       mean_sd.csv
       per_seed.csv
@@ -89,6 +89,6 @@ v7_1_m5/
       status.json
 ```
 
-The supplied `hajj_agent_inputs_v2.jsonl` supports the runner's default example input. For a new frozen-test run, pass `--cases v7_synthetic_data/test_locked_cases.jsonl` explicitly and provide `GEMINI_API_KEY` privately in your environment. New model calls can consume quota or incur cost; they are **not** necessary to reproduce the saved M5 baseline score. The original code and raw measured results have not been changed by repository cleanup.
+The supplied `m5_inputs.jsonl` supports the runner's default example input. For a new frozen-test run, pass `--cases m5_data/test_locked_cases.jsonl` explicitly and provide `GEMINI_API_KEY` privately in your environment. New model calls can consume quota or incur cost; they are **not** necessary to reproduce the saved M5 baseline score. The original code and raw measured results have not been changed by repository cleanup.
 
 **Responsible use:** Data are team-authored synthetic scenarios rather than records from SAR, real CCTV, clinical observations or identifiable pilgrims. All intervention suggestions are advisory, and real operational decisions would require qualified human oversight. The final paper and presentation are separate course deliverables and are **not included** in this M5 repository cleanup.

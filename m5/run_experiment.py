@@ -13,7 +13,7 @@ from pathlib import Path
 
 from hajj_baseline.providers import LLMProvider, ProviderError
 from hajj_baseline.schema import validate_case
-from factorized_v7 import FactorizedV7
+from m5_agent import M5Agent
 
 CONDITIONS = ('single_factorized_v7','multi_factorized_v7')
 
@@ -25,13 +25,13 @@ def load_cases(path):
 
 def make_agent(name, provider):
     if name not in CONDITIONS:
-        raise ValueError(f'Unsupported condition in V7.1 submission: {name}')
-    return FactorizedV7(provider, mode='single' if name == 'single_factorized_v7' else 'multi')
+        raise ValueError(f'Unsupported condition in M5 submission: {name}')
+    return M5Agent(provider, mode='single' if name == 'single_factorized_v7' else 'multi')
 
 
 def main():
     p=argparse.ArgumentParser()
-    p.add_argument('--cases',default='hajj_agent_inputs_v2.jsonl')
+    p.add_argument('--cases',default='m5_inputs.jsonl')
     p.add_argument('--out',default='live_results.jsonl')
     p.add_argument('--seeds',nargs='+',type=int,default=[11,42,77])
     p.add_argument('--conditions',nargs='+',choices=CONDITIONS,default=list(CONDITIONS))
@@ -52,7 +52,7 @@ def main():
                 'cases_sha256': hashlib.sha256(Path(a.cases).read_bytes()).hexdigest(),
                 'limit': a.limit,
                 'code_sha256': {filename: hashlib.sha256(Path(filename).read_bytes()).hexdigest()
-                    for filename in ('run_experiment.py','factorized_v7.py','policy_v7.json',
+                    for filename in ('run_experiment.py','m5_agent.py','m5_policy.json',
                                      'hajj_baseline/schema.py','hajj_baseline/providers.py')}}
     fingerprint = hashlib.sha256(json.dumps(material,sort_keys=True).encode()).hexdigest()
     if a.dry_run:
@@ -97,7 +97,7 @@ def main():
                     print(f"{condition} seed={seed} {case['case_id']} status={run.decision['status']}"
                           f" risk={run.decision['risk_level']} calls={run.trace['agent_calls_this_pass']}",flush=True)
                     if condition.endswith('_v7') and run.trace.get('schema_valid') is False:
-                        print(f"  V7 validation failure: stage={run.trace.get('failure_stage')}"
+                        print(f"  M5 validation failure: stage={run.trace.get('failure_stage')}"
                               f" error={run.trace.get('schema_error')}",file=sys.stderr,flush=True)
                 if a.case_delay:
                     time.sleep(a.case_delay)

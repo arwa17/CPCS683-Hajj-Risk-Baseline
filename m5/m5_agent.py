@@ -1,4 +1,4 @@
-"""Hajj-AI course V7: one-call typed Single vs three blind specialist calls.
+"""Hajj-AI M5: one-call typed Single vs three blind specialist calls.
 
 A deterministic aggregator is intentionally shared. The policy is a new,
 illustrative classroom policy NOT fitted to M5 gold labels. Never use its
@@ -16,7 +16,7 @@ from typing import Any
 from hajj_baseline.schema import (ACTIONS, DOMAIN_FIELDS, FIELD_PATHS,
                                   safe_abstention, validate_case, validate_decision)
 
-POLICY_PATH = Path(__file__).with_name('policy_v7.json')
+POLICY_PATH = Path(__file__).with_name('m5_policy.json')
 POLICY = json.loads(POLICY_PATH.read_text(encoding='utf-8'))
 FIELD_ORDER = tuple(FIELD_PATHS)
 DOMAINS = tuple(DOMAIN_FIELDS)
@@ -135,20 +135,20 @@ def aggregate(bands: dict, case: dict) -> tuple[dict,dict]:
 
 
 @dataclass
-class V7Run:
+class M5Run:
     decision: dict
     trace: dict
     case: dict
 
 
-class FactorizedV7:
+class M5Agent:
     """Single receives all domains in one call; Multi gets three separate blind calls."""
     def __init__(self, provider: Any, mode: str):
         if mode not in ('single','multi'): raise ValueError('mode must be single or multi')
         self.provider=provider
         self.mode=mode
 
-    def evaluate(self, case: dict) -> V7Run:
+    def evaluate(self, case: dict) -> M5Run:
         case=validate_case(case)
         start=time.perf_counter()
         calls, input_tokens, output_tokens=0,0,0
@@ -237,4 +237,4 @@ class FactorizedV7:
             'observed_band_accuracy':round(correct_bands/total_observed,6) if total_observed else None,
             'human_decision_required':True, 'policy_name':POLICY['name'],
             'is_synthetic_policy':True}
-        return V7Run(decision,trace,case)
+        return M5Run(decision,trace,case)
