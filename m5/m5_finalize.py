@@ -109,18 +109,40 @@ def main():
         'complete':not missing,
         'WARNING':'PREVIEW ONLY; NOT FINAL THREE-SEED RESULTS' if missing else 'All three seeds complete'}
     (out/'status.json').write_text(json.dumps(status,indent=2),encoding='utf-8')
-    lines=['# M5 results', '', f"Model: **{identity['model']}**; prompt version: **{identity['prompt_version']}**; temperature: **{identity['temperature']}**.", '',f"Status: **{'COMPLETE' if not missing else 'INCOMPLETE / PREVIEW ONLY'}**",f"Golden cases: **36**; evaluated rows: **{len(rows)}/216**; missing: **{len(missing)}**.",'',
-    'Synthetic course-label accuracy is not real-world crowd safety validation. Multi-agent and single-agent must use the same cases and seeds.','',
-    '| Condition | Seeds | Coverage (mean ± SD) | Selective accuracy (mean ± SD) | Schema validity (mean ± SD) | Calls/case (mean ± SD) | Latency ms (mean ± SD) |',
-    '|---|---:|---:|---:|---:|---:|---:|']
-    def val(x):return 'N/A' if x is None else f'{x:.4f}'
-    for r in agg:
-        def cell(name):return val(r.get(name+'_mean'))+' ± '+val(r.get(name+'_sd'))
-        lines.append(f"| {r['condition']} | {r['seeds']} | {cell('coverage')} | {cell('selective_accuracy')} | {cell('schema_validity')} | {cell('mean_calls')} | {cell('mean_latency_ms')} |")
-    lines+=['','Component level: `component_trajectory_per_seed.csv` includes observed-field band accuracy and complete-trajectory rate.',
-      'Trajectory metric: calls per case, complete three-specialist reporting with valid schema.','',
-      'SD across a single seed is **undefined**, not 0. Repeated seeds share the same 36 cases.','',
-      'The aggregation policy is explicit and synthetic, so high scores measure policy compliance rather than medical/operational validity.']
+    baseline=next(r for r in agg if r['condition']=='single_factorized_v7')
+    baseline_rows=sum(r['cases'] for r in per if r['condition']=='single_factorized_v7')
+    baseline_comp=[r for r in comp if r['condition']=='single_factorized_v7']
+    def pct(metric):
+        value=baseline[metric+'_mean']
+        sd=baseline[metric+'_sd']
+        return 'N/A' if value is None or sd is None else f'{value*100:.2f}% ± {sd*100:.2f} pp'
+    def numeric(metric):
+        value=baseline[metric+'_mean']
+        sd=baseline[metric+'_sd']
+        return 'N/A' if value is None or sd is None else f'{value:.4f} ± {sd:.4f}'
+    component=[r['mean_observed_band_accuracy'] for r in baseline_comp if r['mean_observed_band_accuracy'] is not None]
+    trajectory=[r['complete_trajectory_rate'] for r in baseline_comp]
+    component_rate='N/A' if not component else f'{statistics.mean(component)*100:.2f}%'
+    trajectory_rate='N/A' if not trajectory else f'{statistics.mean(trajectory)*100:.2f}%'
+    label='COMPLETE' if not missing else 'INCOMPLETE (PREVIEW ONLY)'
+    lines=[
+        '# M5 Evaluation Results',
+        '',
+        f'**Golden set:** {status["gold_cases"]} synthetic cases | **Baseline:** Single-Agent | **Seeds:** {", ".join(SEEDS)}',
+        f'**Model:** {identity["model"]} | **Temperature:** {identity["temperature"]} | **Runs:** {baseline_rows}/{len(SEEDS)*status["gold_cases"]} | **Status:** {label}',
+        '',
+        '| Baseline metric (mean ± SD across seeds) | Result |',
+        '|---|---:|',
+        f'| Coverage | {pct("coverage")} |',
+        f'| Selective accuracy (accepted decisions only) | {pct("selective_accuracy")} |',
+        f'| Schema/policy validity | {pct("schema_validity")} |',
+        f'| Calls per case (trajectory metric) | {numeric("mean_calls")} |',
+        '',
+        f'**Component/trajectory:** Observed-field band accuracy {component_rate} on valid reports; complete trajectories {trajectory_rate}.',
+        '',
+        '**Scoring:** python3 m5_finalize.py (offline and reproducible).',
+        '**Limitation:** Synthetic policy-based labels; no real-world safety validation.',
+    ]
     (out/'REPORT.md').write_text('\n'.join(lines)+'\n',encoding='utf-8')
     print(json.dumps(status,indent=2))
 
