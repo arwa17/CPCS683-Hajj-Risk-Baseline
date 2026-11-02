@@ -1,0 +1,16 @@
+{
+  "model": "gemini-3.5-flash-lite",
+  "prompt_version": "hajj_ai_v7_2_policy_validation_retry",
+  "temperature": 1.0,
+  "gold_cases": 36,
+  "completed_rows": 216,
+  "expected_rows": 216,
+  "missing_rows": 0,
+  "seeds_completed": [
+    "11",
+    "42",
+    "77"
+  ],
+  "complete": true,
+  "WARNING": "All three seeds complete"
+}
