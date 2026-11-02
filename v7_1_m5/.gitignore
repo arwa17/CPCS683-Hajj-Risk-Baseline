@@ -1,9 +1,0 @@
-__pycache__/
-*.py[cod]
-.env
-.env.*
-!.env.example
-.DS_Store
-__MACOSX/
-results/*.meta.json
-results/v71_test_extra_seeds.jsonl

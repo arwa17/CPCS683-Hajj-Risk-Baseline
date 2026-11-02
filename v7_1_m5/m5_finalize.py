@@ -87,9 +87,9 @@ def extra_metrics(rows):
 
 def main():
     p=argparse.ArgumentParser()
-    p.add_argument('--out',default='results/m5_35_score')
+    p.add_argument('--out',default='results/m5_v72_score')
     p.add_argument('--allow-incomplete',action='store_true',help='Preview only. Do not submit as three-seed evidence.')
-    p.add_argument('--results',nargs='+',default=['results/v71_35_all_seeds.jsonl'])
+    p.add_argument('--results',nargs='+',default=['results/v72_35_all_seeds.jsonl'])
     a=p.parse_args()
     verify_hashes()
     rows,missing=combine_and_check(a.results,a.allow_incomplete)

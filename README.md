@@ -1,133 +1,94 @@
-# Hajj Risk Baseline
+# Hajj Crowd-Risk Prioritization
 
 **Course:** CPCS 683 — Advanced Artificial Intelligence  
-**Milestone:** M4 — 14 October 2026  
-**Team:** Arwa Al-Zahrani, Atheer Al-Sharif, Batool Al-Sulami
+**Team:** Arwa Al-Zahrani, Atheer Al-Sharif, Batool Al-Sulami  
+**Current deliverable:** M5 — Evaluation Harness
 
-## About
+## Study and dataset
 
-This project demonstrates a **single generalist LLM agent** for prioritizing **synthetic Hajj risk scenarios**. The agent uses **Gemini 3.1 Flash-Lite** through the Google Gemini API. It reviews observations about crowd conditions, health and environment, then returns LOW, MEDIUM, HIGH or ABSTAIN if reliable information is insufficient.
+The goal is to measure a **single-agent baseline** that assigns LOW, MEDIUM or HIGH priority to synthetic Hajj crowd-risk cases or abstains when evidence or model output is unreliable. The study is an illustrative classroom simulation, **not** validated real-world Hajj safety guidance.
 
-All five cases are handcrafted simulations, not real Hajj data. Model-generated priorities are not validated real-world safety decisions.
+The frozen golden set contains **36 synthetic cases** with **36 policy-derived reference labels**. Each case describes seven observations: crowd density, queue time, distance between people, fatigue, stress, emergency event and temperature. Every observation includes its quality and simulated source. The team-defined thresholds are in `v7_1_m5/policy_v7.json`; reference labels are *not* independent expert judgments.
 
-## Requirements
+The baseline was evaluated on the **same 36 cases across three seeds** (11, 42 and 77), for **108 completed Single-Agent runs**. The full saved experiment file also contains 108 Multi-Agent runs. The strict scoring program checks the entire **216-row** experimental grid, but only the **Single-Agent rows** are required for this M5 baseline result.
 
-- Python 3.10 or later
-- Git
-- Internet access
-- A **Gemini API key** from [Google AI Studio](https://aistudio.google.com/apikey)
+## M5 required deliverables
 
-No model download or additional Python packages are required. The Gemini API has usage quotas; check [Google's pricing and free-tier information](https://ai.google.dev/gemini-api/docs/pricing).
+| Required item | Location |
+|---|---|
+| Golden set (36 cases) | `v7_1_m5/v7_synthetic_data/test_locked_cases.jsonl` |
+| Reference labels | `v7_1_m5/v7_synthetic_data/test_locked_gold.jsonl` |
+| Frozen-set integrity | `v7_1_m5/v7_synthetic_data/manifest.json` |
+| Automated scoring code | `v7_1_m5/m5_finalize.py` and `scoring.py` |
+| Actual model outputs | `v7_1_m5/results/v72_35_all_seeds.jsonl` |
+| Baseline score for each seed | `v7_1_m5/results/m5_v72_score/per_seed.csv` |
+| Mean and sample standard deviation | `v7_1_m5/results/m5_v72_score/mean_sd.csv` |
+| Component and trajectory metrics | `v7_1_m5/results/m5_v72_score/component_trajectory_per_seed.csv` |
+| Evaluation status and report | `v7_1_m5/results/m5_v72_score/status.json` and `REPORT.md` |
 
-## Setup
+## Baseline results (three seeds)
 
-**1. Clone the project** (Terminal on macOS/Linux or PowerShell on Windows):
+**Model:** Gemini 3.5 Flash-Lite; **requested temperature:** 1.0.
 
-```bash
-git clone https://github.com/arwa17/CPCS683-Hajj-Risk-Baseline.git
-cd CPCS683-Hajj-Risk-Baseline
-```
+| Measure | Seed 11 | Seed 42 | Seed 77 | Mean ± sample SD |
+|---|---:|---:|---:|---:|
+| Correct accepted decisions | 29/36 | 29/36 | 29/36 | 29.00 ± 0.00 |
+| Decision coverage / all-case accuracy | 80.56% | 80.56% | 80.56% | **80.56% ± 0.00 pp** |
+| Selective accuracy (accepted decisions) | 100.00% | 100.00% | 100.00% | **100.00% ± 0.00 pp** |
+| Schema/policy validation success | 97.22% | 97.22% | 97.22% | **97.22% ± 0.00 pp** |
+| Mean model calls per case | 1.056 | 1.028 | 1.056 | **1.0467 ± 0.0162** |
+| Mean evaluation latency | 6.28 s | 1.32 s | 2.21 s | **3.27 ± 2.65 s** |
 
-If you already cloned the project, enter your repository folder and run `git pull`.
+**Metric definitions:** Coverage = valid accepted decisions / all runs. Selective accuracy = correct accepted decisions / valid accepted decisions (excludes abstentions). All-case accuracy = correct accepted decisions / all runs. Schema/policy validity = successful report validation / all runs. The reported variance uses the **sample SD over three seed-level scores**, not across 108 independent cases. The same 36 cases are reused across seeds.
 
-**2. Set your own Gemini API key.** Do not include your key in any GitHub file, screenshot or shared message.
+**Component/trajectory evaluation:** The complete, policy-valid Single-Agent reporting trajectory rate was **35/36 (97.22%) for each seed**. Observed-field band accuracy was 100% *among successfully validated reports only*; this conditional metric cannot establish real-world accuracy.
 
-On **macOS / Linux**:
+**Failure analysis:** Each seed produced 29 correct accepted decisions and seven abstentions: six because unreliable observations could affect the final risk tier, and one because repeated invalid model reports triggered safe fallback (`V7-0021`). No incorrect accepted label occurred relative to the synthetic policy. The limitations are the illustrative, policy-derived labels, a modest synthetic test set and dependence on a commercial model.
 
-```bash
-export GEMINI_API_KEY="YOUR_KEY_HERE"
-```
+## Reproduce the scores (offline, no API calls)
 
-On **Windows PowerShell**:
-
-```powershell
-$env:GEMINI_API_KEY="YOUR_KEY_HERE"
-```
-
-**3. Start the application.**
-
-On **macOS / Linux**:
-
-```bash
-python3 -m hajj_baseline.webapp
-```
-
-On **Windows**:
-
-```powershell
-py -m hajj_baseline.webapp
-```
-
-**4. Open** http://127.0.0.1:8765 in your browser, select a case and click **Run analysis**.
-
-The browser runs locally; only the synthetic case data is sent to Gemini over the internet. Keep the terminal running while demonstrating the application, and press `Ctrl+C` to stop. If another instance is using port 8765, stop it first.
-
-## Demo
-
-The interface offers five synthetic cases:
-- **High indicators**
-- **Mixed indicators**
-- **Low indicators**
-- **Missing information**
-- **Conflicting information**
-
-Run a case to display its risk priority or abstention, recommended review action and explanation. Expand **Evidence and run information** to see evidence field paths, model name, one-call trace, response time and JSON output.
-
-## Inputs and outputs
-
-Each case contains seven observations:
-
-| Area | Observations |
-| --- | --- |
-| Crowd | Crowd density, queue time, distance |
-| Health | Fatigue, stress, emergency event |
-| Environment | Temperature |
-
-Every observation includes a value, source and quality label. The agent returns **LOW, MEDIUM, HIGH, or ABSTAIN**, a review action, explanation, uncertainty notes where applicable, and supporting field references. A structured trace records one LLM call and its duration.
-
-## Project files
-
-| Path | Purpose |
-| --- | --- |
-| `hajj_baseline/agent.py` | Runs one generalist agent and records its output |
-| `hajj_baseline/providers.py` | Calls the Google Gemini API |
-| `hajj_baseline/schema.py` | Validates input and output structure |
-| `hajj_baseline/webapp.py` | Serves the local browser demonstration |
-| `examples/` | Five synthetic risk scenarios |
-| `tests/test_baseline.py` | Offline tests for input, output, API transport and browser behavior |
-
-## Repeated evaluations
-
-The Gemini generation seed defaults to **42**. The planned evaluation seeds are **11, 42, and 77**. Set `HAJJ_SEED` before launching the app; each run records the configured seed in its trace.
-
-**macOS / Linux:**
+Python **3.10+** is required; the scoring scripts use the standard library. From the cloned repository:
 
 ```bash
-export HAJJ_SEED=11
-python3 -m hajj_baseline.webapp
+cd v7_1_m5
+python3 m5_finalize.py
+cat results/m5_v72_score/REPORT.md
 ```
 
-**Windows PowerShell:**
+The scorer verifies the golden-set SHA-256 hashes, 36-case coverage per seed/condition, no duplicate rows, and consistent model/parameter identifiers. Expected results: `complete: true`, `missing_rows: 0`, `completed_rows: 216`. The baseline has **108** of these saved rows; the other 108 preserve the controlled follow-on comparison.
 
-```powershell
-$env:HAJJ_SEED="11"
-py -m hajj_baseline.webapp
+## Minimal code and data
+
+```text
+README.md
+.gitignore
+v7_1_m5/
+  factorized_v7.py
+  policy_v7.json
+  hajj_baseline/
+    __init__.py
+    providers.py
+    schema.py
+  hajj_agent_inputs_v2.jsonl
+  run_experiment.py
+  resume_with_retries.py
+  m5_finalize.py
+  scoring.py
+  v7_synthetic_data/
+    manifest.json
+    test_locked_cases.jsonl
+    test_locked_gold.jsonl
+  results/
+    v72_35_all_seeds.jsonl
+    m5_v72_score/
+      REPORT.md
+      mean_sd.csv
+      per_seed.csv
+      component_trajectory_per_seed.csv
+      paired.json
+      status.json
 ```
 
-Stop the server before selecting another seed. Re-run the **same cases** for each seed and record the actual decisions, call counts and time in later milestones. Google's seed setting is a best-effort reproducibility aid, **not a guarantee of identical outputs**, and the current five demo examples are not a scored evaluation set.
+The supplied `hajj_agent_inputs_v2.jsonl` supports the runner's default example input. For a new frozen-test run, pass `--cases v7_synthetic_data/test_locked_cases.jsonl` explicitly and provide `GEMINI_API_KEY` privately in your environment. New model calls can consume quota or incur cost; they are **not** necessary to reproduce the saved M5 baseline score. The original code and raw measured results have not been changed by repository cleanup.
 
-## Tests
-
-Run the tests without a live API request:
-
-```bash
-python3 -m unittest discover -s tests -v
-```
-
-On Windows, use `py -m unittest discover -s tests -v`.
-
-The unit tests use simulated model responses; an actual Gemini API call is demonstrated by clicking **Run analysis** with a valid API key. **Output valid** means the JSON structure and evidence references passed validation, not that risk prediction accuracy has been established.
-
-## Evaluation scope
-
-This M4 deliverable is a **single-agent baseline**, not a multi-agent system. Full accuracy evaluation, repeated-run benchmarking and multi-agent comparisons belong to subsequent milestones. Because the baseline model is Gemini, future experimental comparisons must document that model choice consistently.
+**Responsible use:** Data are team-authored synthetic scenarios rather than records from SAR, real CCTV, clinical observations or identifiable pilgrims. All intervention suggestions are advisory, and real operational decisions would require qualified human oversight. The final paper and presentation are separate course deliverables and are **not included** in this M5 repository cleanup.

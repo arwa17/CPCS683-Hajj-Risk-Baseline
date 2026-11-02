@@ -1,3 +1,0 @@
-condition,seed,cases,schema_validity,coverage,selective_accuracy,all_case_accuracy,review_valid_rate,beneficial_flip_rate,harmful_flip_rate,specialist_validity,mean_latency_ms,mean_calls,mean_input_tokens,mean_output_tokens,schema_valid,fallback_or_failure,decisions,correct,under_escalation,over_escalation,model_abstains,reviews_attempted,reviews_valid,beneficial_flips,harmful_flips,other_flips,decision_to_abstain,all_specialist_reports_valid,coordinator_retries
-multi_factorized_v7,11,36,1.0,0.805556,1.0,0.805556,,,,,12313.65,3,1182.31,117.17,36,0,29,29,0,0,7,0,0,0,0,0,0,0,0
-single_factorized_v7,11,36,0.972222,0.805556,1.0,0.805556,,,,,5767.09,1,777.31,101.5,35,1,29,29,0,0,6,0,0,0,0,0,0,0,0

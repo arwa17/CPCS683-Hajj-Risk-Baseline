@@ -6,7 +6,7 @@ __pycache__/
 .env
 .env.*
 !.env.example
-.streamlit/secrets.toml
-runs/
-*.log
 .DS_Store
+*.log
+v7_1_m5/results/*.meta.json
+v7_1_m5/results/smoke35.jsonl

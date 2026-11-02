@@ -1,7 +1,0 @@
-condition,seed,cases,mean_observed_band_accuracy,band_accuracy_trace_coverage,complete_trajectory_rate
-multi_factorized_v7,11,36,0.986772,1.0,1.0
-multi_factorized_v7,42,36,1.0,0.972222,0.972222
-multi_factorized_v7,77,36,0.995238,0.972222,0.972222
-single_factorized_v7,11,36,0.99537,1.0,1.0
-single_factorized_v7,42,36,1.0,1.0,1.0
-single_factorized_v7,77,36,1.0,1.0,1.0

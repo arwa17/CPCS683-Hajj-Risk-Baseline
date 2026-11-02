@@ -1,11 +1,4 @@
 {
-  "dev": {
-    "cases": "dev_cases.jsonl",
-    "gold": "dev_gold.jsonl",
-    "n": 12,
-    "cases_sha256": "5db1163ff964c599542f4892f5c54c48f9ed06be40ed2cb84871828e8e459f92",
-    "gold_sha256": "0a2db00befc5101f8648d92483f37df3d17ba7209267a3c09025dad40116250b"
-  },
   "test": {
     "cases": "test_locked_cases.jsonl",
     "gold": "test_locked_gold.jsonl",
