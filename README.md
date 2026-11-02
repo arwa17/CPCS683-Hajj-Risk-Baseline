@@ -12,6 +12,16 @@ The frozen golden set contains **36 synthetic cases** with **36 policy-derived r
 
 The baseline was evaluated on the **same 36 cases across three seeds** (11, 42 and 77), for **108 completed Single-Agent runs**. The full saved experiment file also contains 108 Multi-Agent runs. The strict scoring program checks the entire **216-row** experimental grid, but only the **Single-Agent rows** are required for this M5 baseline result.
 
+## Ground-truth construction and validity
+
+**Provenance.** The 36 cases and their reference labels were created for this course, not taken from SAR, clinical records, or the published study. The set contains 12 LOW, 12 MEDIUM and 12 HIGH reference labels by design; this balanced sample does **not** estimate the prevalence of real Hajj risk levels. No expert has independently validated these labels.
+
+**Predefined labeling rule.** Each of seven fields is mapped to an ordinal band (0, 1, or 2) by the explicit rules in `m5/m5_policy.json`. For numeric values, the *illustrative* cutoffs are queue time 20/50 minutes, distance below 1.5/0.75 metres, and temperature 33/39°C. The three domain means (crowd, health, environment) receive equal weight. The aggregate score is mapped to LOW below 0.7, MEDIUM from 0.7 to below 1.35, and HIGH from 1.35. These numerical cutoffs were selected for a controlled classroom benchmark; **they are not evidence-based Hajj operational thresholds**. Reference labels were fixed independently of Gemini outputs, and dataset hashes are recorded in `m5/m5_data/manifest.json`.
+
+**What is measured.** The scoring measures how faithfully the system follows this declared policy when observation quality can be unreliable. The same policy is available to the agent, so high conditional policy agreement is **not independent evidence of real-world risk prediction**. Abstentions and invalid model responses are reported separately; selective accuracy excludes them. An independent expert review or a separately labeled real-world set would be needed before claims about actual crowd safety.
+
+**Related research.** The crowd, health and environment domain framing is informed by Najwa Samrgandi, *Multi-Agent Crowd-Risk Prioritization for Large-Scale Events: A Hybrid ML–Agent Approach*, IJACSA 17(7), 2026, DOI: [10.14569/IJACSA.2026.0170738](https://doi.org/10.14569/IJACSA.2026.0170738). This coursework implementation is **not** a replication of that study's XGBoost model, dataset or published scores.
+
 ## M5 required deliverables
 
 | Required item | Location |
