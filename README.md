@@ -14,6 +14,17 @@ python3 m6/build_m6.py
 
 This reads the saved 216-run experiment and generates local CSV/Markdown analysis files. M6 presentation materials and reports are delivered separately, not stored in the repository.
 
+## Running both conditions
+
+The implementation of the Single-Agent baseline and the three-specialist Multi-Agent treatment is in `m5/m5_agent.py`. The command below checks the case set and both run configurations **without calling Gemini**:
+
+```bash
+cd m5
+python3 run_experiment.py --cases m5_data/test_locked_cases.jsonl --conditions single_factorized_v7 multi_factorized_v7 --seeds 11 42 77 --model gemini-3.5-flash-lite --temperature 1.0 --limit 1 --dry-run
+```
+
+To perform new inference instead, provide `GEMINI_API_KEY` privately and omit `--dry-run`; choose a new `--out` path. New runs use API quota and are **not needed** to reproduce the saved M6 comparison.
+
 ## Study and dataset
 
 The goal is to measure a **single-agent baseline** that assigns LOW, MEDIUM or HIGH priority to synthetic Hajj crowd-risk cases or abstains when evidence or model output is unreliable. The study is an illustrative classroom simulation, **not** validated real-world Hajj safety guidance.
