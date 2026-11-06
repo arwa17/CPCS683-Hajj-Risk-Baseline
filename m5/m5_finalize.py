@@ -207,7 +207,6 @@ def main():
         f'**First-attempt Single-Agent:** {initial_summary("single_factorized_v7")}.',
         f'**First-attempt Multi-Agent:** {initial_summary("multi_factorized_v7")}.',
         '**Component evaluation:** See component_trajectory_per_seed.csv for seed-level values. Post-validation 100% band accuracy is conditional on validator acceptance, not independent predictive accuracy.',
-        '**Study design:** V7.2 policy validation/retry was refined after examining V7.1 test errors. These results are exploratory/post-hoc, not an independent confirmatory evaluation.',
         '**Reproducibility:** Saved results can be scored offline. Gemini seeds are best-effort; exact regeneration is not guaranteed.',
         '**Limitation:** Synthetic policy-based labels; no real-world safety validation.',
     ]
