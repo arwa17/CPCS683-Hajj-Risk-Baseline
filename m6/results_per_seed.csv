@@ -1,7 +1,0 @@
-condition,seed,cases,coverage,selective_accuracy,schema_validity,mean_calls,mean_input_tokens,mean_output_tokens,mean_latency_ms,model_abstains,fallback_or_failure
-multi_factorized_v7,11,36,0.805556,1.0,0.972222,2.972,1174.17,99.83,18620.78,6,1
-multi_factorized_v7,42,36,0.777778,1.0,0.944444,2.944,1168.67,96.28,4110.02,6,2
-multi_factorized_v7,77,36,0.805556,1.0,1.0,3.083,1223.22,103.11,5936.78,7,0
-single_factorized_v7,11,36,0.805556,1.0,0.972222,1.056,820.94,88.83,6282.83,6,1
-single_factorized_v7,42,36,0.805556,1.0,0.972222,1.028,797.81,90.25,1315.43,6,1
-single_factorized_v7,77,36,0.805556,1.0,0.972222,1.056,821.33,89.42,2211.24,6,1
