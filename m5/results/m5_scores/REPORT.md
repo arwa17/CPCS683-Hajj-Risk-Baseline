@@ -17,4 +17,4 @@
 
 **First-attempt component evaluation (before validation/retry):** Single-Agent 718/723 correct observed bands (99.31%), 103/108 fully correct first-attempt reports (95.37%); Multi-Agent 705/711 correct observed bands (99.16%), 312/318 fully correct first-attempt specialist reports (98.11%). See component_trajectory_per_seed.csv for seed-level details.
 
-**Interpretation:** Post-validation 100% accuracy is conditional on a validator using the synthetic reference policy, not real-world predictive performance. V7.2 followed inspection of V7.1 test errors; these results are exploratory/post-hoc rather than confirmatory. The stored model/temperature are Gemini 3.5 Flash-Lite/1.0, while runner defaults differ. Offline scoring is reproducible; generation with seeds is best-effort.
+**Interpretation:** Post-validation 100% accuracy is conditional on a validator using the synthetic reference policy, not real-world predictive performance. The stored model/temperature are Gemini 3.5 Flash-Lite/1.0, while runner defaults differ. Offline scoring is reproducible; generation with seeds is best-effort.
