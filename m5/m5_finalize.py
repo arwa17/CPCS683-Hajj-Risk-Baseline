@@ -90,7 +90,7 @@ def first_attempt_metrics(batch):
             try:
                 raw = raw_list[0].strip()
                 if raw.startswith('```'):
-                    raw = '\\n'.join(raw.splitlines()[1:-1]).strip()
+                    raw = '\n'.join(raw.splitlines()[1:-1]).strip()
                 obj = json.loads(raw)
                 bands = obj['bands']
                 if not isinstance(bands, dict):
@@ -178,6 +178,13 @@ def main():
         return 'N/A' if value is None or sd is None else f'{value:.4f} ± {sd:.4f}'
     component=[r['mean_observed_band_accuracy'] for r in baseline_comp if r['mean_observed_band_accuracy'] is not None]
     trajectory=[r['complete_trajectory_rate'] for r in baseline_comp]
+    def initial_summary(condition):
+        groups = [r for r in comp if r['condition'] == condition]
+        correct = sum(r['first_attempt_band_correct'] for r in groups)
+        total = sum(r['first_attempt_band_total'] for r in groups)
+        full = sum(r['first_attempt_reports_correct'] for r in groups)
+        attempts = sum(r['first_attempt_reports_total'] for r in groups)
+        return f'{correct}/{total} ({100*correct/total:.2f}%) observed bands; {full}/{attempts} ({100*full/attempts:.2f}%) full first-attempt reports'
     component_rate='N/A' if not component else f'{statistics.mean(component)*100:.2f}%'
     trajectory_rate='N/A' if not trajectory else f'{statistics.mean(trajectory)*100:.2f}%'
     label='COMPLETE' if not missing else 'INCOMPLETE (PREVIEW ONLY)'
@@ -197,7 +204,9 @@ def main():
         f'**Component/trajectory:** Observed-field band accuracy {component_rate} on valid reports; complete trajectories {trajectory_rate}.',
         '',
         '**Scoring:** python3 m5_finalize.py (offline and reproducible).',
-        '**First-attempt components:** See component_trajectory_per_seed.csv for raw band accuracy before validation/retry. Post-validation 100% band accuracy is conditional on validator acceptance, not independent predictive accuracy.',
+        f'**First-attempt Single-Agent:** {initial_summary("single_factorized_v7")}.',
+        f'**First-attempt Multi-Agent:** {initial_summary("multi_factorized_v7")}.',
+        '**Component evaluation:** See component_trajectory_per_seed.csv for seed-level values. Post-validation 100% band accuracy is conditional on validator acceptance, not independent predictive accuracy.',
         '**Study design:** V7.2 policy validation/retry was refined after examining V7.1 test errors. These results are exploratory/post-hoc, not an independent confirmatory evaluation.',
         '**Reproducibility:** Saved results can be scored offline. Gemini seeds are best-effort; exact regeneration is not guaranteed.',
         '**Limitation:** Synthetic policy-based labels; no real-world safety validation.',
