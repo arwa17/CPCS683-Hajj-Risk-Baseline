@@ -2,7 +2,17 @@
 
 **Course:** CPCS 683 — Advanced Artificial Intelligence  
 **Team:** Arwa Al-Zahrani, Atheer Al-Sharif, Batool Al-Sulami  
-**Current deliverable:** M5 — Evaluation Harness
+**Current deliverables:** M5 — Evaluation Harness; M6 — Experimental Condition and Results
+
+## M6 source and offline evaluation
+
+The same `m5/m5_agent.py` implements Single-Agent and Multi-Agent modes. To regenerate the M6 comparison tables and failure log locally without making Gemini API calls, run from the repository root:
+
+```bash
+python3 m6/build_m6.py
+```
+
+This reads the saved 216-run experiment and generates local CSV/Markdown analysis files. M6 presentation materials and reports are delivered separately, not stored in the repository.
 
 ## Study and dataset
 
@@ -114,4 +124,4 @@ m5/
 
 The supplied `m5_inputs.jsonl` supports the runner's default example input. For a new frozen-test run, pass `--cases m5_data/test_locked_cases.jsonl` explicitly and provide `GEMINI_API_KEY` privately in your environment. New model calls can consume quota or incur cost; they are **not** necessary to reproduce the saved M5 baseline score. The saved evaluation records are available in `m5/results/m5_runs.jsonl`.
 
-**Responsible use:** Data are team-authored synthetic scenarios rather than records from SAR, real CCTV, clinical observations or identifiable pilgrims. All intervention suggestions are advisory, and real operational decisions would require qualified human oversight. The final paper and presentation are separate course deliverables and are **not included** in this M5 repository cleanup.
+**Responsible use:** Data are team-authored synthetic scenarios rather than records from SAR, real CCTV, clinical observations or identifiable pilgrims. All intervention suggestions are advisory, and real operational decisions would require qualified human oversight. 
