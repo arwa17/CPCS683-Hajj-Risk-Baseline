@@ -66,7 +66,7 @@ def main():
                 "mean_calls_mean", "mean_calls_sd", "mean_input_tokens_mean",
                 "mean_input_tokens_sd", "mean_output_tokens_mean", "mean_output_tokens_sd",
                 "mean_latency_ms_mean", "mean_latency_ms_sd", "mean_tokens_per_case", "sd_tokens_per_case"]
-        writer = csv.DictWriter(f, cols)
+        writer = csv.DictWriter(f, cols, extrasaction="ignore")
         writer.writeheader()
         for r in mean_sd:
             writer.writerow({**r, "cases_per_seed": 36,
