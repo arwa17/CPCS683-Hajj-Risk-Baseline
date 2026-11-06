@@ -1,3 +1,0 @@
-condition,cases_per_seed,seeds,coverage_mean,coverage_sd,selective_accuracy_mean,selective_accuracy_sd,schema_validity_mean,schema_validity_sd,mean_calls_mean,mean_calls_sd,mean_input_tokens_mean,mean_input_tokens_sd,mean_output_tokens_mean,mean_output_tokens_sd,mean_latency_ms_mean,mean_latency_ms_sd,mean_tokens_per_case
-multi_factorized_v7,36,3,0.796297,0.016038,1.0,0.0,0.972222,0.027778,2.999667,0.073514,1188.686667,30.032913,99.74,3.415889,9555.86,7903.407112,1288.426667
-single_factorized_v7,36,3,0.805556,0.0,1.0,0.0,0.972222,0.0,1.046667,0.016166,813.36,13.468107,89.5,0.713372,3269.833333,2647.495151,902.86
