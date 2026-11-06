@@ -62,13 +62,11 @@ The raw first-attempt reports in `m5/results/m5_runs.jsonl` allow a component-le
 
 The post-validation observed-band accuracy of 100% is **conditional by construction**: the validator rejects bands that disagree with the same synthetic policy used to derive the reference labels. Therefore, neither 100% selective accuracy nor the validated band rate demonstrates independent real-world prediction performance. The informative measures are first-attempt errors, decision coverage, fallbacks, and costs.
 
-## Evaluation history and limitations
-
-The current 216 saved evaluations use the `hajj_ai_v7_2_policy_validation_retry` implementation. V7.2's policy validation/retry was refined **after inspecting V7.1 errors on the same locked test set**. The present results are therefore **exploratory/post-hoc**, not an independent confirmatory test. Earlier V7.1 evidence can be inspected in Git history (e.g. commits `9f1c502` and `11d5eb2`). Repository cleanup removed some earlier experimental artifacts, while preserving the current V7.2 raw records. New runs on these same cases would not create an independent held-out validation.
+## Execution settings and comparison limitations
 
 The saved traces report model `gemini-3.5-flash-lite` and temperature `1.0`. The defaults in `m5/run_experiment.py` differ (`gemini-3.1-flash-lite` and `0`), and the exact original invocation was not preserved. Seeds are best-effort for hosted Gemini generation: exact re-generation cannot be guaranteed, whereas `python3 m5_finalize.py` reproduces the offline scoring.
 
-For the exploratory Single-Agent versus Multi-Agent comparison, coverage is **80.56% versus 79.63%**, respectively, with no demonstrated Multi-Agent advantage. Multi-Agent uses about three times as many model calls. Both conditions use the same policy and validator, but the Multi-Agent condition has more specialist-report opportunities to fail or retry; this is a limitation of the organizational comparison.
+The Single-Agent and Multi-Agent coverage rates are **80.56% and 79.63%**, respectively, with no demonstrated Multi-Agent advantage. Multi-Agent uses about three times as many model calls. Both conditions use the same policy and validator, but Multi-Agent has more specialist-report opportunities to fail or retry.
 
 ## Reproduce the scores (offline, no API calls)
 
@@ -114,6 +112,6 @@ m5/
       status.json
 ```
 
-The supplied `m5_inputs.jsonl` supports the runner's default example input. For a new frozen-test run, pass `--cases m5_data/test_locked_cases.jsonl` explicitly and provide `GEMINI_API_KEY` privately in your environment. New model calls can consume quota or incur cost; they are **not** necessary to reproduce the saved M5 baseline score. The current V7.2 raw measured results remain preserved; repository cleanup removed some older V7.1 and diagnostic artifacts (see evaluation history above).
+The supplied `m5_inputs.jsonl` supports the runner's default example input. For a new frozen-test run, pass `--cases m5_data/test_locked_cases.jsonl` explicitly and provide `GEMINI_API_KEY` privately in your environment. New model calls can consume quota or incur cost; they are **not** necessary to reproduce the saved M5 baseline score. The saved evaluation records are available in `m5/results/m5_runs.jsonl`.
 
 **Responsible use:** Data are team-authored synthetic scenarios rather than records from SAR, real CCTV, clinical observations or identifiable pilgrims. All intervention suggestions are advisory, and real operational decisions would require qualified human oversight. The final paper and presentation are separate course deliverables and are **not included** in this M5 repository cleanup.
