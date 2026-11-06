@@ -2,7 +2,11 @@
 
 **Course:** CPCS 683 — Advanced Artificial Intelligence  
 **Team:** Arwa Al-Zahrani, Atheer Al-Sharif, Batool Al-Sulami  
-**Current deliverable:** M5 — Evaluation Harness
+**Current deliverables:** M5 — Evaluation Harness; M6 — Experimental Condition and Results
+
+## M6 submission
+
+See [M6 — Experimental Condition and Results](m6/README.md) for the implemented treatment architecture, paired comparison, token cost per task, latency with variance, case-level failure analysis, offline analysis script, and presentation guide. M5 source results remain unchanged.
 
 ## Study and dataset
 
