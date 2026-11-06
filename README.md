@@ -6,7 +6,7 @@
 
 ## M6 submission
 
-See [M6 — Experimental Condition and Results](m6/README.md) for the implemented treatment architecture, paired comparison, token cost per task, latency with variance, case-level failure analysis, offline analysis script, and presentation guide. M5 source results remain unchanged.
+See [M6 — Experimental Condition and Results](m6/README.md) for the implemented treatment architecture, paired comparison, token cost per task, latency with variance, case-level failure analysis and offline analysis script. M5 source results remain unchanged.
 
 ## Study and dataset
 
@@ -118,4 +118,4 @@ m5/
 
 The supplied `m5_inputs.jsonl` supports the runner's default example input. For a new frozen-test run, pass `--cases m5_data/test_locked_cases.jsonl` explicitly and provide `GEMINI_API_KEY` privately in your environment. New model calls can consume quota or incur cost; they are **not** necessary to reproduce the saved M5 baseline score. The saved evaluation records are available in `m5/results/m5_runs.jsonl`.
 
-**Responsible use:** Data are team-authored synthetic scenarios rather than records from SAR, real CCTV, clinical observations or identifiable pilgrims. All intervention suggestions are advisory, and real operational decisions would require qualified human oversight. The final paper and presentation are separate course deliverables and are **not included** in this M5 repository cleanup.
+**Responsible use:** Data are team-authored synthetic scenarios rather than records from SAR, real CCTV, clinical observations or identifiable pilgrims. All intervention suggestions are advisory, and real operational decisions would require qualified human oversight. 
