@@ -4,9 +4,15 @@
 **Team:** Arwa Al-Zahrani, Atheer Al-Sharif, Batool Al-Sulami  
 **Current deliverables:** M5 — Evaluation Harness; M6 — Experimental Condition and Results
 
-## M6 submission
+## M6 source and offline evaluation
 
-See [M6 — Experimental Condition and Results](m6/README.md) for the implemented treatment architecture, paired comparison, token cost per task, latency with variance, case-level failure analysis and offline analysis script. M5 source results remain unchanged.
+The same `m5/m5_agent.py` implements Single-Agent and Multi-Agent modes. To regenerate the M6 comparison tables and failure log locally without making Gemini API calls, run from the repository root:
+
+```bash
+python3 m6/build_m6.py
+```
+
+This reads the saved 216-run experiment and generates local CSV/Markdown analysis files. M6 presentation materials and reports are delivered separately, not stored in the repository.
 
 ## Study and dataset
 
