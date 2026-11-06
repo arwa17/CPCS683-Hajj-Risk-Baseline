@@ -72,6 +72,61 @@ def trajectory_complete(trace, condition):
     return calls == len(expected)
 
 
+
+def first_attempt_metrics(batch):
+    """Score raw first attempts before policy validation/retry.
+    Denominator includes observed fields present in parseable first-attempt
+    band reports; missing/unparseable reports are not treated as correct.
+    """
+    from m5_agent import POLICY, policy_band
+    cases = {r['case_id']: r for r in read_jsonl(CASES)}
+    correct = total = complete = attempts = unparseable = 0
+    for run in batch:
+        case = cases[run['case_id']]
+        for raw_list in (run.get('trace') or {}).get('report_attempts', {}).values():
+            if not raw_list:
+                continue
+            attempts += 1
+            try:
+                raw = raw_list[0].strip()
+                if raw.startswith('```'):
+                    raw = '\n'.join(raw.splitlines()[1:-1]).strip()
+                obj = json.loads(raw)
+                bands = obj['bands']
+                if not isinstance(bands, dict):
+                    raise ValueError('bands must be an object')
+            except (ValueError, TypeError, KeyError, IndexError):
+                unparseable += 1
+                continue
+            all_correct = True
+            for path, band in bands.items():
+                if path not in POLICY['banding']:
+                    all_correct = False
+                    continue
+                domain, field = path.split('.')
+                observation = case['domains'][domain][field]
+                if observation['quality'] != 'observed':
+                    if band is not None:
+                        all_correct = False
+                    continue
+                total += 1
+                expected = policy_band(path, observation['value'])
+                if type(band) is int and band == expected:
+                    correct += 1
+                else:
+                    all_correct = False
+            if all_correct:
+                complete += 1
+    return {
+        'first_attempt_band_correct': correct,
+        'first_attempt_band_total': total,
+        'first_attempt_band_accuracy': round(correct / total, 6) if total else None,
+        'first_attempt_reports_correct': complete,
+        'first_attempt_reports_total': attempts,
+        'first_attempt_full_report_rate': round(complete / attempts, 6) if attempts else None,
+        'first_attempt_unparseable_reports': unparseable,
+    }
+
 def extra_metrics(rows):
     groups=defaultdict(list)
     for r in rows: groups[r['condition'],str(r['seed'])].append(r)
@@ -82,7 +137,8 @@ def extra_metrics(rows):
         result.append({'condition':condition,'seed':seed,'cases':len(batch),
             'mean_observed_band_accuracy':round(statistics.mean(x),6) if x else None,
             'band_accuracy_trace_coverage':round(len(x)/len(batch),6),
-            'complete_trajectory_rate':round(sum(trajectory_complete(t,condition) for t in traces)/len(batch),6)})
+            'complete_trajectory_rate':round(sum(trajectory_complete(t,condition) for t in traces)/len(batch),6),
+            **first_attempt_metrics(batch)})
     return result
 
 def main():
@@ -122,6 +178,13 @@ def main():
         return 'N/A' if value is None or sd is None else f'{value:.4f} ± {sd:.4f}'
     component=[r['mean_observed_band_accuracy'] for r in baseline_comp if r['mean_observed_band_accuracy'] is not None]
     trajectory=[r['complete_trajectory_rate'] for r in baseline_comp]
+    def initial_summary(condition):
+        groups = [r for r in comp if r['condition'] == condition]
+        correct = sum(r['first_attempt_band_correct'] for r in groups)
+        total = sum(r['first_attempt_band_total'] for r in groups)
+        full = sum(r['first_attempt_reports_correct'] for r in groups)
+        attempts = sum(r['first_attempt_reports_total'] for r in groups)
+        return f'{correct}/{total} ({100*correct/total:.2f}%) observed bands; {full}/{attempts} ({100*full/attempts:.2f}%) full first-attempt reports'
     component_rate='N/A' if not component else f'{statistics.mean(component)*100:.2f}%'
     trajectory_rate='N/A' if not trajectory else f'{statistics.mean(trajectory)*100:.2f}%'
     label='COMPLETE' if not missing else 'INCOMPLETE (PREVIEW ONLY)'
@@ -141,6 +204,10 @@ def main():
         f'**Component/trajectory:** Observed-field band accuracy {component_rate} on valid reports; complete trajectories {trajectory_rate}.',
         '',
         '**Scoring:** python3 m5_finalize.py (offline and reproducible).',
+        f'**First-attempt Single-Agent:** {initial_summary("single_factorized_v7")}.',
+        f'**First-attempt Multi-Agent:** {initial_summary("multi_factorized_v7")}.',
+        '**Component evaluation:** See component_trajectory_per_seed.csv for seed-level values. Post-validation 100% band accuracy is conditional on validator acceptance, not independent predictive accuracy.',
+        '**Reproducibility:** Saved results can be scored offline. Gemini seeds are best-effort; exact regeneration is not guaranteed.',
         '**Limitation:** Synthetic policy-based labels; no real-world safety validation.',
     ]
     (out/'REPORT.md').write_text('\n'.join(lines)+'\n',encoding='utf-8')
