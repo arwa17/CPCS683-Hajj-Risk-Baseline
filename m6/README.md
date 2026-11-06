@@ -10,11 +10,10 @@
 |---|---|
 | Complete treatment implementation | `m5/m5_agent.py`, `m5/run_experiment.py`, `m5/hajj_baseline/` |
 | Same frozen golden set and seeds | 36 cases × seeds 11, 42, 77 × 2 conditions = 216 saved runs |
-| Results table comparing conditions | `m6/results_summary.csv`, `m6/results_per_seed.csv` |
+| Results table comparing conditions | Tables in this README, calculated from saved M5 results |
 | Variance and latency per condition | Mean ± sample SD across three seed-level scores and mean measured latency |
 | Cost per task in tokens | Average input, output and combined tokens per case in the results table |
-| Failure analysis | `m6/FAILURE_ANALYSIS.md` and `m6/failure_analysis_generated.md` |
-| Team presentation | `m6/PRESENTATION_GUIDE.md` |
+| Failure analysis | Case-level failure section in this README |
 
 ## C6.1 — Treatment implementation and manipulated design factor
 
@@ -66,11 +65,28 @@ This is **sequential execution of independent specialist calls**, not an agent d
 | 42 | 80.56% | 77.78% | 1.028 | 2.944 |
 | 77 | 80.56% | 80.56% | 1.056 | 3.083 |
 
-Source of all numerical results: `m5/results/m5_runs.jsonl`, `m5/results/m5_scores/per_seed.csv`, `mean_sd.csv`, and `paired.json`. Detailed machine-readable tables are in this folder.
+Source of all numerical results: `m5/results/m5_runs.jsonl`, `m5/results/m5_scores/per_seed.csv`, `mean_sd.csv`, and `paired.json`. Machine-readable M6 tables can be generated locally using `m6/build_m6.py`.
 
-## C6.4 — Failures and explanations
+## C6.4 — Failure analysis
 
-See `FAILURE_ANALYSIS.md` for observed case-level causes, repeated abstentions and validation failures. This separates policy-driven abstention (appropriate when uncertain evidence changes the tier) from generation/validation failure and distinguishes accepted-decision accuracy from all-case coverage.
+The 108 saved case-seed results for each condition have the following outcomes:
+
+| Outcome | Single-Agent | Multi-Agent |
+|---|---:|---:|
+| Accepted policy-correct decision | 87 | 86 |
+| Valid abstention (uncertain evidence) | 18 | 19 |
+| Validation failure → safe fallback | 3 | 3 |
+| Accepted decision with an incorrect policy label | 0 | 0 |
+
+The six cases **V7-0003, V7-0012, V7-0018, V7-0019, V7-0026 and V7-0069** consistently trigger abstention because the unreliable observations permit multiple policy tiers. This is an intended outcome rather than an incorrect accepted classification.
+
+**Recorded validation failures** involve converting `crowd.distance_between_people_m` to the policy band. The Single-Agent fails after retry on `V7-0021` for seeds 11, 42, and 77. The Multi-Agent crowd specialist fails on `V7-0021` for seeds 11 and 42 and on `V7-0005` for seed 42. Multi-Agent's `V7-0021` at seed 77 is a **valid abstention**, not a validation failure.
+
+Across the 108 matched case-seed pairs, both systems are correct and accepted in 86 pairs, only Single is correct and accepted in one pair (`V7-0005`, seed 42), only Multi in zero pairs, and neither in 21 pairs. The same 36 synthetic cases are reused across seeds, so pairs are not independent examples.
+
+**First-attempt component validation:** Single-Agent reports 718/723 (99.31%) correct observed-field bands and 103/108 (95.37%) fully correct first reports; Multi-Agent reports 705/711 (99.16%) correct bands and 312/318 (98.11%) fully correct specialist reports. The different denominators reflect one report per case for Single and three specialist reports (where produced) per case for Multi.
+
+The results support **no measurable coverage advantage** for Multi-Agent in this sample. Both use a policy-derived reference and shared post-generation validator; conditional accepted accuracy does not establish real-world crowd-risk prediction performance.
 
 ## Reproduce M6 analysis offline (no API key needed)
 
@@ -80,7 +96,7 @@ From the repository root, with Python 3.10+:
 python3 m6/build_m6.py
 ```
 
-This checks dataset hashes and verifies the full 216-record grid, then regenerates `m6/results_per_seed.csv`, `m6/results_summary.csv`, and `m6/failure_analysis_generated.md` from the saved raw results. It does not call Gemini or modify M5. The saved model output is the fixed evidence for this analysis; Gemini's seed is best-effort and exact re-generation is not guaranteed.
+This checks dataset hashes and verifies the full 216-record grid, then generates untracked local CSV summaries and a detailed failure log from the saved raw results. It does not call Gemini or modify M5. The saved model output is the fixed evidence for this analysis; Gemini's seed is best-effort and exact re-generation is not guaranteed.
 
 ## Scope and interpretation
 
