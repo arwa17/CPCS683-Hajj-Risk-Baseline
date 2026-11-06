@@ -46,19 +46,31 @@ def main():
         writer.writeheader()
         writer.writerows({k: r.get(k) for k in cols} for r in per)
 
+    token_cost_by_condition = {}
+    for cond in ("single_factorized_v7", "multi_factorized_v7"):
+        cost_per_seed = []
+        for seed in ("11", "42", "77"):
+            subset = [r for r in rows if r["condition"] == cond and str(r["seed"]) == seed]
+            cost_per_seed.append(statistics.mean(
+                (r["trace"].get("input_tokens") or 0) +
+                (r["trace"].get("output_tokens") or 0) for r in subset))
+        token_cost_by_condition[cond] = {
+            "mean_tokens_per_case": round(statistics.mean(cost_per_seed), 6),
+            "sd_tokens_per_case": round(statistics.stdev(cost_per_seed), 6),
+        }
+
     with (out_dir / "results_summary.csv").open("w", newline="", encoding="utf-8") as f:
         cols = ["condition", "cases_per_seed", "seeds", "coverage_mean", "coverage_sd",
                 "selective_accuracy_mean", "selective_accuracy_sd",
                 "schema_validity_mean", "schema_validity_sd",
                 "mean_calls_mean", "mean_calls_sd", "mean_input_tokens_mean",
                 "mean_input_tokens_sd", "mean_output_tokens_mean", "mean_output_tokens_sd",
-                "mean_latency_ms_mean", "mean_latency_ms_sd", "mean_tokens_per_case"]
+                "mean_latency_ms_mean", "mean_latency_ms_sd", "mean_tokens_per_case", "sd_tokens_per_case"]
         writer = csv.DictWriter(f, cols)
         writer.writeheader()
         for r in mean_sd:
             writer.writerow({**r, "cases_per_seed": 36,
-                             "mean_tokens_per_case": round(
-                                 r["mean_input_tokens_mean"] + r["mean_output_tokens_mean"], 6)})
+                             **token_cost_by_condition[r["condition"]]})
 
     failures = defaultdict(list)
     model_abstentions = Counter()
