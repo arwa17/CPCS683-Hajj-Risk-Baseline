@@ -1,7 +1,7 @@
-condition,seed,cases,mean_observed_band_accuracy,band_accuracy_trace_coverage,complete_trajectory_rate
-multi_factorized_v7,11,36,1.0,0.972222,0.972222
-multi_factorized_v7,42,36,1.0,0.944444,0.944444
-multi_factorized_v7,77,36,1.0,1.0,1.0
-single_factorized_v7,11,36,1.0,0.972222,0.972222
-single_factorized_v7,42,36,1.0,0.972222,0.972222
-single_factorized_v7,77,36,1.0,0.972222,0.972222
+condition,seed,cases,mean_observed_band_accuracy,band_accuracy_trace_coverage,complete_trajectory_rate,first_attempt_band_correct,first_attempt_band_total,first_attempt_band_accuracy,first_attempt_reports_correct,first_attempt_reports_total,first_attempt_full_report_rate,first_attempt_unparseable_reports
+multi_factorized_v7,11,36,1.0,0.972222,0.972222,236,237,0.995781,105,106,0.990566,0
+multi_factorized_v7,42,36,1.0,0.944444,0.944444,231,233,0.991416,102,104,0.980769,0
+multi_factorized_v7,77,36,1.0,1.0,1.0,238,241,0.987552,105,108,0.972222,0
+single_factorized_v7,11,36,1.0,0.972222,0.972222,239,241,0.991701,34,36,0.944444,0
+single_factorized_v7,42,36,1.0,0.972222,0.972222,240,241,0.995851,35,36,0.972222,0
+single_factorized_v7,77,36,1.0,0.972222,0.972222,239,241,0.991701,34,36,0.944444,0
