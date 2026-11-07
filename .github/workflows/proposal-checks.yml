@@ -1,0 +1,23 @@
+name: Proposal-aligned checks
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'proposal/**'
+      - '.github/workflows/proposal-checks.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Validate proxy rules, holdout, smoke run and hashes
+        run: python -m unittest discover -s proposal -p 'test_*.py' -v
