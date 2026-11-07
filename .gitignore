@@ -10,8 +10,12 @@ __pycache__/
 *.log
 m5/results/*.meta.json
 m5/results/smoke35.jsonl
+m5/live_results.jsonl
+m5/live_results.jsonl.meta.json
+m5/results/m5_scores/paired.json
+m5/results/m5_scores/REPORT.md
+m5/results/m5_scores/status.json
 
-# M6 outputs are generated offline; keep repository source-only.
 m6/results_per_seed.csv
 m6/results_summary.csv
 m6/failure_analysis_generated.md

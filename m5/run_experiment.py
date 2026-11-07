@@ -31,12 +31,12 @@ def make_agent(name, provider):
 
 def main():
     p=argparse.ArgumentParser()
-    p.add_argument('--cases',default='m5_inputs.jsonl')
+    p.add_argument('--cases',default='m5_data/test_locked_cases.jsonl')
     p.add_argument('--out',default='live_results.jsonl')
     p.add_argument('--seeds',nargs='+',type=int,default=[11,42,77])
     p.add_argument('--conditions',nargs='+',choices=CONDITIONS,default=list(CONDITIONS))
-    p.add_argument('--model',default='gemini-3.1-flash-lite')
-    p.add_argument('--temperature',type=float,default=0)
+    p.add_argument('--model',default='gemini-3.5-flash-lite')
+    p.add_argument('--temperature',type=float,default=1.0)
     p.add_argument('--limit',type=int,default=None)
     p.add_argument('--resume',action='store_true')
     p.add_argument('--dry-run',action='store_true')
