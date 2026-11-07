@@ -32,9 +32,9 @@ M5 tables: `m5/results/m5_scores/`. M6 analysis is generated in `m6/`. New Gemin
 | Calls/case | 1.05 ± 0.02 | 3.00 ± 0.07 |
 | Latency (s) | 3.27 ± 2.65 | 9.56 ± 7.90 |
 
-## Data and changes from M2/M3
+## Completed M2 proposal and implementation notes
 
-- **M2 planned:** Kaggle Hajj/Umrah data (10,000 synthetic records), a weighted risk proxy, and an 80% coverage target.
+- **M2 proposal (completed):** Kaggle Hajj/Umrah data (10,000 synthetic records), a weighted risk proxy, and an 80% coverage target.
 - **M4 used:** Five hand-written synthetic demo cases (not Kaggle).
 - **M5 used:** 36 team-written synthetic cases with an equal-weight policy (not Kaggle or expert labels). Cases and labels: `m5/m5_data/`; policy: `m5/m5_policy.json`; raw runs: `m5/results/m5_runs.jsonl`.
 - **Limitations:** Coverage was measured, not fixed at 80%. Calibration, the original XGBoost model, and independent evidence verification were not implemented. Each report may be retried once.
