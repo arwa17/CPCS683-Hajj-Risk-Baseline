@@ -118,24 +118,40 @@ def prepare(csv_path, destination, seed=42):
     for bucket in buckets.values():
         rng.shuffle(bucket)
     selected = []
-    # Six clean cases from each tier; remaining twelve stress cases sample across tiers.
+    used = set()
+    # Eighteen clean and nine corrupted cases, balanced across risk tiers.
     for level in buckets:
-        if len(buckets[level]) < 10:
-            raise ValueError("Hold-out set has too few " + level + " cases for 30-case suite")
-        selected.extend(buckets[level][:10])
+        if len(buckets[level]) < 9:
+            raise ValueError("Hold-out set has too few " + level + " cases")
+        for j, item in enumerate(buckets[level][:9]):
+            difficulty = "clean" if j < 6 else ("missing", "noisy", "conflicting")[j - 6]
+            selected.append((item, difficulty))
+            used.add(item[0])
+    # The last three cases are genuinely near the declared class boundaries.
+    remaining = [item for item in records if item[0] not in used]
+    remaining.sort(key=lambda item: min(abs(item[2]["score"] - LOW_BOUND),
+                                        abs(item[2]["score"] - HIGH_BOUND)))
+    selected.extend((item, "borderline") for item in remaining[:3])
     cases = []
-    for j, (row_index, row, ref) in enumerate(selected):
-        difficulty = ("clean" if j % 10 < 6 else ("missing", "noisy", "conflicting", "borderline")[j % 10 - 6])
+    for j, ((row_index, row, ref), difficulty) in enumerate(selected):
         field = list(WEIGHTS)[(j // 3) % len(WEIGHTS)]
         observed = {k: {"value": row[k], "quality": "observed"} for k in WEIGHTS}
-        if difficulty != "clean" and difficulty != "borderline":
+        if difficulty in ("missing", "noisy", "conflicting"):
             observed[field]["quality"] = difficulty
             if difficulty == "missing":
                 observed[field]["value"] = None
             elif difficulty == "conflicting":
-                observed[field]["alternate_value"] = "CONFLICTING_OBSERVATION"
+                original = row[field]
+                observed[field]["alternate_value"] = (
+                    str(round(float(original) * 1.7 + 1, 3)) if numeric([original]) and field != "Emergency_Event"
+                    else ("High" if str(original).strip().lower() == "low" else "Low")
+                )
             else:
-                observed[field]["value"] = "NOISY_OBSERVATION"
+                original = row[field]
+                observed[field]["value"] = (
+                    str(round(float(original) * 1.25 + 1, 3)) if numeric([original]) and field != "Emergency_Event"
+                    else ("High" if str(original).strip().lower() == "low" else "Low")
+                )
         cases.append({
             "case_id": f"HAJJ-{j+1:03d}", "source_row_index": row_index,
             "difficulty": difficulty, "observations": observed,
