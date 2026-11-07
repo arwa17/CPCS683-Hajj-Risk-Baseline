@@ -3,15 +3,15 @@
 **CPCS 683 — Advanced AI**  
 Arwa Al-Zahrani · Atheer Al-Sharif · Batool Al-Sulami
 
-## Project
+## Study
 
-Compare Single-Agent and Multi-Agent systems on 36 synthetic cases and 3 seeds (11, 42, 77). Both use the same risk rules.
+Compare a Single-Agent with three domain specialists (Crowd, Health, Environment) using the same rules, 36 cases, and seeds 11, 42, 77. A shared **code-based** coordinator combines the reports.
 
-Model: Gemini 3.5 Flash-Lite (temperature 1.0). **216 saved runs**.
+**Gemini 3.5 Flash-Lite**, temperature 1.0; 216 saved runs.
 
 ## Run
 
-Python 3.10+:
+Python 3.10+; no API key needed to rescore saved results:
 
 ```bash
 cd m5
@@ -20,24 +20,24 @@ cd ..
 python3 m6/build_m6.py
 ```
 
-These commands reproduce scores without an API key. New Gemini runs require `GEMINI_API_KEY`. M5 results are in `m5/results/m5_scores/`; M6 results are generated in `m6/`.
+M5 tables: `m5/results/m5_scores/`. M6 analysis is generated in `m6/`. New Gemini inference requires `GEMINI_API_KEY`.
 
-## Results
+## Results (mean ± SD, three seeds)
 
-| Metric (mean ± SD) | Single-Agent | Multi-Agent |
+| Metric | Single-Agent | Multi-Agent |
 |---|---:|---:|
 | Coverage | 80.56% ± 0.00 pp | 79.63% ± 1.60 pp |
 | Selective accuracy | 100% ± 0.00 pp | 100% ± 0.00 pp |
-| Valid outputs | 97.22% ± 0.00 pp | 97.22% ± 2.78 pp |
-| Calls per case | 1.05 ± 0.02 | 3.00 ± 0.07 |
-| Latency | 3.27 ± 2.65 s | 9.56 ± 7.90 s |
+| Valid reports | 97.22% ± 0.00 pp | 97.22% ± 2.78 pp |
+| Calls/case | 1.05 ± 0.02 | 3.00 ± 0.07 |
+| Latency (s) | 3.27 ± 2.65 | 9.56 ± 7.90 |
 
-First-attempt component accuracy: Single-Agent 99.31%; Multi-Agent 99.16%.
+## Data and changes from M2/M3
 
-## Data
+- **M2 planned:** Kaggle Hajj/Umrah data (10,000 synthetic records), a weighted risk proxy, and an 80% coverage target.
+- **M4 used:** Five hand-written synthetic demo cases (not Kaggle).
+- **M5 used:** 36 team-written synthetic cases with an equal-weight policy (not Kaggle or expert labels). Cases and labels: `m5/m5_data/`; policy: `m5/m5_policy.json`; raw runs: `m5/results/m5_runs.jsonl`.
+- **Limitations:** Coverage was measured, not fixed at 80%. Calibration, the original XGBoost model, and independent evidence verification were not implemented. Each report may be retried once.
+- Scores measure agreement with our policy, not real-world safety. Selective accuracy excludes abstentions.
 
-- Cases and labels: `m5/m5_data/`. Rules: `m5/m5_policy.json`.
-- Model code: `m5/m5_agent.py`. Scoring: `m5/m5_finalize.py` and `m5/scoring.py`.
-- Raw results: `m5/results/m5_runs.jsonl`.
-- Labels are **team-defined synthetic policy labels**, not expert judgments. Results show policy compliance, not real-world Hajj safety.
-- Research basis: [Samrgandi (2026)](https://doi.org/10.14569/IJACSA.2026.0170738). This is not a replication of the original dataset or model.
+**Research basis:** [N. Samrgandi (2026)](https://doi.org/10.14569/IJACSA.2026.0170738). This project is not a replication of that paper's dataset or model.
